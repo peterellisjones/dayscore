@@ -34,16 +34,19 @@ header {
 
 .things {
   .thing {
+    position: relative;
     padding-top: 10px;
     padding-bottom: 10px;
     .name {
       font-size: 30px;
+      line-height: 1.2em;
     }  
     a:hover {
       cursor:pointer;
     }
     .buttons {
-      font-size: 12px;
+      position: absolute;
+      bottom: -12px;
       a {
         padding-right: 10px;
       }
@@ -52,10 +55,12 @@ header {
     a.inactive {
       color: #555;
     }
-    height: 40px;  
+    min-height: 30px; 
+    padding-bottom: 15px; 
     .icon {
       width: 30px;
-      height: 30px;
+      height: 40px;
+      margin-top: 8px;
       float: left;
       font-size: 20px;
       color: #157AB5;
@@ -68,10 +73,15 @@ header {
 }
 
 .add-thing {
+  font-size: 20px;
+  padding-top: 10px;
   margin-bottom: 20px;
   padding-left: 30px;
   input {
     width: 450px;
+  }
+  a {
+    cursor: pointer;
   }
 }
 
