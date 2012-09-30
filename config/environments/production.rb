@@ -63,4 +63,7 @@ Habit::Application.configure do
 
   config.assets.css_compressor = :yui
   config.less.compress = true
+
+  Haml::Template.options[:ugly] = :true
+
 end
