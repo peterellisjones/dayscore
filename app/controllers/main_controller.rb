@@ -11,6 +11,7 @@ class MainController < ApplicationController
 
   def create_user
     user = User.create!
+    Rails.logger.error "Couldn't create user" unless user
     if Rails.env == 'development'
       user.create_test_data
     end
