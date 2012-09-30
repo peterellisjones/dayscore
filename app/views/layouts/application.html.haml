@@ -26,26 +26,25 @@
               .addthis_toolbox.addthis_default_style.pull-right
                 %a.addthis_button_compact
         = yield
-        - cache('footer') do
+        :javascript
+          window.user_random_string = "#{@user.rand_str}";
+        - cache('footer_and_javascript') do
           %footer.footer
             .row
               .span12
                 .pull-right.copyright
                   &copy; 2012 
                   = link_to 'Peter Ellis Jones', 'http://twitter.com/_ukoki_'
-    :javascript
-      window.user_random_string = "#{@user.rand_str}";
-    - cache('javascript') do
-      :javascript
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-29268598-4']);
-        _gaq.push(['_setDomainName', 'dayscore.com']);
-        _gaq.push(['_trackPageview']);
+          :javascript
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-29268598-4']);
+            _gaq.push(['_setDomainName', 'dayscore.com']);
+            _gaq.push(['_trackPageview']);
 
-        (function() {
-          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
-      = javascript_include_tag "application"
-      = javascript_include_tag "http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-506897ab556c9cc0"
+            (function() {
+              var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+              ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+          = javascript_include_tag "application"
+          = javascript_include_tag "http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-506897ab556c9cc0"
