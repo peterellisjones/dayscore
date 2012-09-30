@@ -9,6 +9,7 @@ gem 'rails', '3.2.8'
 # in production environments by default.
 group :assets do
   gem 'sass-rails'
+  gem 'less-rails'
   gem 'coffee-rails'
   gem 'compass-rails'
   gem 'twitter-bootstrap-rails'
