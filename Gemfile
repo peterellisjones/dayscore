@@ -27,8 +27,8 @@ group :production do
   gem "yui-compressor"
 end
 
-gem "unicorn"
 gem "mongoid", ">= 3.0.5"
+gem "bson_ext"
 gem "haml", ">= 3.1.7"
 gem "rspec-rails", ">= 2.11.0", :group => [:development, :test]
 gem "capybara", ">= 1.1.2", :group => :test
