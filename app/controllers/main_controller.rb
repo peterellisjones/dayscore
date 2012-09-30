@@ -4,12 +4,12 @@ class MainController < ApplicationController
 
   def home
     Rails.logger.info "FINDING USER WITH ID: #{params[:user_id]}"
-    begin
-      @user = User.where(rand_str: params[:user_id]).first
-      Rails.logger.info "FOUND USER #{@user.inspect}"
-    rescue
+    @user = User.where(rand_str: params[:user_id]).first
+    unless @user
       Rails.logger.info "DIDN'T FIND USER #{@user.inspect}"
       create_user   
+    else
+      Rails.logger.info "FOUND USER #{@user.inspect}"
     end
   end
 
