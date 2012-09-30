@@ -269,7 +269,7 @@ $ ->
     xaxis = {}
     xaxis.mode = 'time'
     xaxis.min = window.chart_data[0][0] - 12*60*60*1000
-    xaxis.max = window.chart_data[window.chart_data.length-1][0] + 12*60*60*100
+    xaxis.max = window.chart_data[window.chart_data.length-1][0] + 12*60*60*1000
     xaxis.minTickSize = 24*60*60*1000
 
     yaxis = {}
