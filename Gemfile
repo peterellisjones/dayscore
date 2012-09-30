@@ -42,3 +42,4 @@ gem "launchy", ">= 2.1.2", :group => :test
 gem "factory_girl_rails", ">= 4.0.0", :group => [:development, :test]
 gem "therubyracer", ">= 0.10.2", :group => :assets, :platform => :ruby
 gem "simple_form", ">= 2.0.2"
+gem 'newrelic_rpm'
