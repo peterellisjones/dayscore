@@ -28,8 +28,8 @@ class User
   index({ rand_str: 1 }, { unique: true, name: "rand_str_index" })
 
   def generate_rand_str
-    chars = [('a'..'z'),('A'..'Z'),('0'..'9')].map{|i| i.to_a}.flatten
-    self.rand_str = (0...20).map{ chars[rand(chars.length)] }.join
+    chars = [('a'..'z'),('A'..'Z'),('0'..'9')].map {|i| i.to_a}.flatten
+    self.rand_str = (0...20).map { chars[rand(chars.length)] }.join
   end
 
   def uri
