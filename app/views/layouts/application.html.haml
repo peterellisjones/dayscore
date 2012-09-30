@@ -10,23 +10,13 @@
       = stylesheet_link_tag "application", :media => "all"
       = javascript_include_tag "application"
       = csrf_meta_tags
-      :javascript
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-29268598-4']);
-        _gaq.push(['_setDomainName', 'dayscore.com']);
-        _gaq.push(['_trackPageview']);
-
-        (function() {
-          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+      
   %body
     #main{:role => "main"}
       .container  
         %header.jumbotron.subhead
           .row
-            .span12
+            .span7
               %h1 DayScore
               %p.lead 
                 Reinforce positive habits by keeping score. 
@@ -34,13 +24,29 @@
                 - link = 'http://dayscore.net' + home_path(@user.rand_str)
                 = link_to 'Bookmark this page', link, class: 'bookmark-link'
                 and come back tomorrow to update your score.
+            .span5
+              .addthis_toolbox.addthis_default_style.pull-right
+                %a.addthis_button_compact
         = yield
         - cache do
           %footer.footer
             .row
               .span12
-                .pull-right
+                .pull-right.copyright
                   &copy; 2012 
                   = link_to 'Peter Ellis Jones', 'http://twitter.com/_ukoki_'
     :javascript
       window.user_random_string = "#{@user.rand_str}";
+    - cache do
+      :javascript
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-29268598-4']);
+          _gaq.push(['_setDomainName', 'dayscore.com']);
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+      = javascript_include_tag "http://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-506897ab556c9cc0"
