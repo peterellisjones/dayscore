@@ -244,11 +244,48 @@ $ ->
       point_options = { show: true, radius: 5, fill: true, fillColor: '#ACDBF5' }
     if (slide == true)
       console.log 'slide'
-    chart = $.plot($("#chart"), [ 
-      {label: 'daily score', data: window.chart_data, color: '#ACDBF5', lines: {lineWidth: 5, show: true}, points: point_options }, # 2FA4E7
-      {label: '7 day moving average', data: window.sma_seven, color: '#2FA4E7', lines: {lineWidth: 5 }},
-      {label: '30 day moving average', data: window.sma_thirty, color: '#317EAC', lines: {lineWidth: 5}}  ], 
-      { xaxis: { mode: 'time', min: window.chart_data[0][0] - 12*60*60*1000, max: window.chart_data[window.chart_data.length-1][0] + 12*60*60*1000, minTickSize: 24*60*60*1000 }, yaxis: { min: 0, tickSize: 1 }})
+
+    daily_score = {}
+    daily_score.label =  'daily score'
+    daily_score.data =  window.chart_data
+    daily_score.color = '#ACDBF5'
+    daily_score.lines = {lineWidth: 5, show: true}
+    daily_score.points = point_options
+
+    seven_day_ma = {}
+    seven_day_ma.label = '7 day moving average'
+    seven_day_ma.data = window.sma_seven
+    seven_day_ma.color = '#2FA4E7'
+    seven_day_ma.lines = {lineWidth: 5 }
+
+    thirty_day_ma = {}
+    thirty_day_ma.label = '30 day moving average'
+    thirty_day_ma.data = window.sma_thirty
+    thirty_day_ma.color = '#317EAC'
+    thirty_day_ma.lines = {lineWidth: 5 }
+
+    data = [daily_score, seven_day_ma, thirty_day_ma]
+
+    xaxis = {}
+    xaxis.mode = 'time'
+    xaxis.min = window.chart_data[0][0] - 12*60*60*1000
+    xaxis.max = window.chart_data[window.chart_data.length-1][0] + 12*60*60*100
+    xaxis.minTickSize = 24*60*60*1000
+
+    yaxis = {}
+    yaxis.min = 0
+    yaxis.tickSize = 1
+
+    grid = {}
+    grid.show = true
+    grid.aboveData = true
+    grid.borderColor = '#555'
+
+    options = {xaxis: xaxis, yaxis: yaxis, grid: grid}
+
+    console.log options
+    chart = $.plot($("#chart"), data, options)
+      
     chart.draw()
 
   # updates todays chart data by +- 1

@@ -121,7 +121,7 @@ class User
 
   # test data - 
   def create_test_data
-    return
+    #return
     Date.today.downto(Date.today - 2.months) do |day|
       self.thing_templates.each do |t|
         if Random.rand(10) >= 8
