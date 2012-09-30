@@ -9,7 +9,6 @@ gem 'rails', '3.2.8'
 # in production environments by default.
 group :assets do
   gem 'sass-rails'
-  gem 'less-rails'
   gem 'coffee-rails'
   gem 'compass-rails'
   gem 'twitter-bootstrap-rails'
@@ -17,6 +16,7 @@ group :assets do
 end
 
 gem 'jquery-rails'
+gem 'less-rails'
 
 group :development do
   gem "haml-rails"
