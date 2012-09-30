@@ -2,6 +2,8 @@ source 'https://rubygems.org'
 ruby '1.9.3'
 
 gem 'rails', '3.2.8'
+gem 'unicorn'
+gem 'thin'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -43,4 +45,3 @@ gem "factory_girl_rails", ">= 4.0.0", :group => [:development, :test]
 gem "therubyracer", ">= 0.10.2", :group => :assets, :platform => :ruby
 gem "simple_form", ">= 2.0.2"
 gem 'newrelic_rpm'
-gem 'unicorn'
