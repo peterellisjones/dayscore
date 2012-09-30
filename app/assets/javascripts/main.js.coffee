@@ -12,7 +12,6 @@ $ ->
     V = 0.9
     rgb = hsvToRgb(H, S, V)
     str = "rgb(#{Math.floor(rgb[0])}, #{Math.floor(rgb[1])}, #{Math.floor(rgb[2])})"
-    console.log str
     return str
 
   change_points = (diff) ->

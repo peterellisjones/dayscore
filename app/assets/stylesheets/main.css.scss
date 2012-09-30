@@ -72,7 +72,11 @@ header {
   input {
     width: 450px;
   }
-  margin-bottom: 40px;
+}
+
+.footer {
+  margin-top: -50px;
+  padding-bottom: 20px;
 }
 
 .scores {
@@ -105,9 +109,4 @@ header {
   .tickLabel {
     font-size: 15px;
   }
-}
-
-#chart-overview {
-  height: 10px;
-  width: inherit;
 }

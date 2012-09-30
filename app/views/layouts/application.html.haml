@@ -14,5 +14,11 @@
     #main{:role => "main"}
       .container  
         = yield
+        %footer.footer
+          .row
+            .span12
+              .pull-right
+                &copy; 2012 
+                = link_to 'Peter Ellis Jones', 'http://twitter.com/_ukoki_'
     :javascript
       window.user_random_string = "#{@user.rand_str}";
