@@ -1,7 +1,7 @@
 %header.jumbotron.subhead
   .row
     .span12
-      %h1 DayScore.net
+      %h1 DayScore
       %p.lead 
         Reinforce positive habits by keeping score. 
         %br
@@ -36,14 +36,20 @@
         Score
       .score.today
         %h1= todays_things.count
-      .score.this-week{style: "display:none;"}
-        %h1= @user.points_this_week
-      .score.this-month{style: "display:none;"}
-        %h1= @user.points_this_month
-      .score.all-time{style: "display:none;"}
-        %h1= @user.points_all_time
+      - {'this-week' => @user.points_this_week, 'this-month' => @user.points_this_month, 'all-time' => @user.points_all_time}.each do |k, v|
+        - clss = k + (v > 1000 ? ' thousands' : (v > 100 ? ' hundreds' : (v > 10 ? ' tens' : '')))
+        .score{class: clss, style: "display:none;"}
+          %h1= v
       .buttons
         %a.period.today.active today
+        |
         %a.period.this-week this week
+        |
         %a.period.this-month this month
+        |
         %a.period.all-time total
+  .span12
+    #chart
+    #chard-overview
+  :javascript
+    window.chart_data = #{@user.chart_data.map {|k,v| [k,v]}.inspect}.reverse();

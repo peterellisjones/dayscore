@@ -44,51 +44,83 @@ class User
   end
 
   def create_thing(thing_template)
-    thing = Thing.new(name: thing_template.name, datetime: DateTime.now)
+    thing = Thing.new name: thing_template.name, date: user_today
     self.things << thing
     self.save
     thing
   end
 
-  # THIS IS BROKEN...
-  # NEED TO GUESS USERS TIMEZONE AND DO IT LIKE THAT
+  # returns what the day it is for the user
+  # this is used to save the date in the users time frame
   def user_today
-    user_time = DateTime.now + time_diff
+    user_time = Time.now + time_diff
     if user_time.hour < 3
-      user_time = user_time.yesterday.midnight
+      user_day = user_time.yesterday.midnight.to_date
     else
-      user_time = user_time.midnight
+      user_day = user_time.midnight.to_date
     end
-    user_time
+    user_day
   end
 
   def todays_things
-    self.things.where(:datetime.gte => Date.today).entries
+    self.things.where(date: Date.today).entries
   end
 
   def points_this_week
-    self.things.where(:datetime.gte => Date.today.at_beginning_of_week).count
+    self.things.where(:date.gte => Date.today.at_beginning_of_week).count
   end
 
   def points_this_month
-    self.things.where(:datetime.gte => Date.today.at_beginning_of_month).count
+    self.things.where(:date.gte => Date.today.at_beginning_of_month).count
   end
 
   def points_yesterday
-    self.things.where(datetime: Date.today.yesterday).count
+    self.things.where(date: Date.today.yesterday).count
   end
 
   def points_last_week
     last_week = Date.today.at_beginning_of_week - 1.week
-    self.things.where(:datetime.gte => last_week, :datetime.lte => last_week.at_end_of_week).count
+    self.things.where(:date.gte => last_week, :date.lte => last_week.at_end_of_week).count
   end
 
   def points_last_month
     last_month = Date.today.at_beginning_of_month - 1.month
-    self.things.where(:datetime.gte => last_month, :datetime.lte => last_month.at_end_of_month).count
+    self.things.where(:date.gte => last_month, :date.lte => last_month.at_end_of_month).count
   end
 
   def points_all_time
     self.things.count
+  end
+
+  # returns chart data as mapping from JS timestamp to number of things that day.
+  def chart_data
+    thing_hash = {}
+    self.things.each do |thing|
+      js_stamp = thing.date.to_time.to_i * 1000
+      thing_hash[js_stamp] ||= 0
+      thing_hash[js_stamp] += 1
+    end
+    thing_hash
+  end
+
+  # test data - 
+  def create_test_data
+    Date.today.downto(Date.today - 3.months) do |day|
+      self.thing_templates.each do |t|
+        if Random.rand(3) >= 2
+          self.things << Thing.new(name: t.name, date: day)
+        end
+        if Random.rand(3) >= 2
+          self.things << Thing.new(name: t.name, date: day)
+        end
+        if Random.rand(3) >= 2
+          self.things << Thing.new(name: t.name, date: day)
+        end
+        if Random.rand(3) >= 2
+          self.things << Thing.new(name: t.name, date: day)
+        end
+      end
+    end 
+    self.save
   end
 end

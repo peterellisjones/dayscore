@@ -9,6 +9,14 @@ $ ->
     for period in ['today', 'this-week', 'this-month', 'all-time']
       points = parseInt $(".score.#{period} h1").text()
       points += diff
+      elem = $(".score.#{period} h1").removeClass()
+      elem.addClass("score #{period}")
+      if points > 1000
+        elem.addClass('thousands')
+      else if points > 100
+        elem.addClass('hundreds')
+      else if points > 10
+        elem.addClass('tens')
       $(".score.#{period} h1").text(points)
 
   increment_points = () ->
@@ -115,8 +123,37 @@ $ ->
 
   # set change period functionality
   $('.period').click (e) ->
+    if $(this).hasClass('active')
+      return
     period = item for item in $(this).attr('class').split(/\s+/g) when item != 'period'
     $('.period').removeClass('active')
     $(".period.#{period}").addClass('active')
     $('.score').hide()
     $(".score.#{period}").show()
+
+  # calculate seven day moving average
+  window.calc_sma = (n) ->
+    if window.chart_data.length < n
+      return []
+    sum_n = window.chart_data[0...n].map((x) -> parseFloat(x[1]))
+    time = window.chart_data[Math.floor(n/2)][0]
+    mov_average = []
+    mov_average.push [time, (sum_n.reduce (x,y) -> x + y) / n]
+    for point in window.chart_data[n..window.chart_data.length - Math.floor(n/2)]
+      val = parseFloat(point[1])
+      time = point[0]
+      sum_n.shift()
+      sum_n.push(val)
+      mov_average.push([time, (sum_n.reduce (x,y) -> x + y) / n])
+    mov_average
+
+  window.sma_seven = window.calc_sma(7)
+  window.sma_thirty = window.calc_sma(30)
+
+  # draw chart
+  $.plot($("#chart"), [ 
+    {label: 'daily score', data: window.chart_data, color: '#ACDBF5'}, # 2FA4E7
+    {label: '7 day moving average', data: window.sma_seven, color: '#2FA4E7' },
+    {label: '30 day moving average', data: window.sma_thirty, color: '#317EAC' }  ], 
+    { xaxis: { mode: 'time', min: window.chart_data[0][0], max: window.chart_data[window.chart_data.length-1][0] }, yaxis: { min: 0, tickSize: 1 }});
+

@@ -2,7 +2,7 @@ class Thing
   include Mongoid::Document
 
   field :name, type: String
-  field :datetime, type: DateTime
+  field :date, type: Date
 
   embedded_in :user
 end

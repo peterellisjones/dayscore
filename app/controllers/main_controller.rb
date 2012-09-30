@@ -1,6 +1,6 @@
 class MainController < ApplicationController
   before_filter :get_user, except: [:home, :create_user]
-  before_filter :update_user_time_diff, except: [:home, :create_user]
+  before_filter :update_user_time_diff, only: :create_thing
 
   def home
     @user = User.where(rand_str: params[:user_id]).first
@@ -11,6 +11,9 @@ class MainController < ApplicationController
 
   def create_user
     user = User.create!
+    if Rails.env == 'development'
+      user.create_test_data
+    end
     redirect_to home_path(user.uri)
   end
 
