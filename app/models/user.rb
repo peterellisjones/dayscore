@@ -3,6 +3,13 @@ class User
 
   before_create :generate_rand_str
   before_create :set_default_thing_templates
+  before_create :set_created_at
+
+  field :created_at, type: Date
+
+  def set_created_at
+    self.created_at = Date.today
+  end
 
   # time diff is the difference between the users local time and the server time in seconds
   # server time + time diff = local time
@@ -100,23 +107,24 @@ class User
       thing_hash[js_stamp] ||= 0
       thing_hash[js_stamp] += 1
     end
+
+    # force today = 0
+    js_stamp = Date.today.to_time.to_i * 1000
+    thing_hash[js_stamp] ||= 0
+
+    # for created_at = 0
+    js_stamp = self.created_at.to_time.to_i * 1000
+    thing_hash[js_stamp] ||= 0
+
     thing_hash
   end
 
   # test data - 
   def create_test_data
-    Date.today.downto(Date.today - 3.months) do |day|
+    return
+    Date.today.downto(Date.today - 2.months) do |day|
       self.thing_templates.each do |t|
-        if Random.rand(3) >= 2
-          self.things << Thing.new(name: t.name, date: day)
-        end
-        if Random.rand(3) >= 2
-          self.things << Thing.new(name: t.name, date: day)
-        end
-        if Random.rand(3) >= 2
-          self.things << Thing.new(name: t.name, date: day)
-        end
-        if Random.rand(3) >= 2
+        if Random.rand(10) >= 8
           self.things << Thing.new(name: t.name, date: day)
         end
       end

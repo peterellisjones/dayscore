@@ -6,7 +6,7 @@
         Reinforce positive habits by keeping score. 
         %br
         - link = 'http://dayscore.net' + home_path(@user.rand_str)
-        = link_to 'Bookmark this link', link, class: 'bookmark-link'
+        = link_to 'Bookmark this page', link, class: 'bookmark-link'
         and come back tomorrow to update your score.
 .row
   .span8
@@ -25,11 +25,17 @@
           - else
             %div.icon
             %a.name.inactive{id: tt._id}= tt.name
+          %form.form-inline
+            %input.input-medium{value: tt.name, type: 'text'}
+            %button.btn Submit
           %p.buttons
             %a.edit edit
             %a.delete delete
-      %p
-        %a.add-thing add more
+    .add-thing
+      %a add more
+      %form.form-inline
+        %input.input-medium{type: 'text'}
+        %button.btn Submit
   .span4
     .scores
       %p.intro 
@@ -52,4 +58,4 @@
     #chart
     #chard-overview
   :javascript
-    window.chart_data = #{@user.chart_data.map {|k,v| [k,v]}.inspect}.reverse();
+    window.chart_data_hash = eval(#{@user.chart_data.to_json});

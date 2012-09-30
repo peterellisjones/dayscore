@@ -39,6 +39,15 @@ class MainController < ApplicationController
     render :json => thing
   end
 
+  def create_template
+    if params[:name] == nil
+      render :json => "No name!", :status => :unprocessable_entity and return
+    end
+    thing_template = ThingTemplate.new name: params[:name]
+    @user.thing_templates << thing_template
+    render :json => thing_template
+  end
+
   def destroy_thing
     thing = @user.things.where(id: params[:thing_id]).first
     if thing == nil
@@ -59,5 +68,34 @@ class MainController < ApplicationController
     end
     template.destroy
     render :json => { _id: params[:template_id] }
+  end
+
+  def edit_thing
+    thing = @user.things.where(id: params[:thing_id]).first
+    old_name = thing.name
+    if thing == nil
+      render :json => "Couldn't find thing", :status => :unprocessable_entity and return
+    end
+    if params[:name] == nil
+      render :json => "No name!", :status => :unprocessable_entity and return
+    end
+    thing.update_attribute(:name, params[:name])
+    # need to update template too!
+    thing_template = @user.thing_templates.where(name: old_name).first
+    thing_template.update_attribute(:name, params[:name])
+
+    render :json => thing
+  end
+
+  def edit_template
+    thing_template = @user.thing_templates.where(id: params[:template_id]).first
+    if thing_template == nil
+      render :json => "Couldn't find thing template", :status => :unprocessable_entity and return
+    end
+    if params[:name] == nil
+      render :json => "No name!", :status => :unprocessable_entity and return
+    end
+    thing_template.update_attribute(:name, params[:name])
+    render :json => thing_template
   end
 end
