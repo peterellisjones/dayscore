@@ -25,6 +25,7 @@ class User
   # rand_str is a random string that is used to create the url in the form of
   # /rand_str
   field :rand_str, type: String
+  index({ rand_str: 1 }, { unique: true, name: "rand_str_index" })
 
   def generate_rand_str
     chars = [('a'..'z'),('A'..'Z'),('0'..'9')].map{|i| i.to_a}.flatten
@@ -38,6 +39,7 @@ class User
   # thing is something the user has done
   # it has a name and an associated date
   embeds_many :things
+  index({ "things.date" => 1 }, { name: "things_date_index" })
 
   # a thing template is something the user
   # is trying to do regularly
