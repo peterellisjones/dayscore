@@ -1,24 +1,45 @@
 !!!
 %html
-  %head
-    %meta{:charset => "utf-8"}
-    %meta{"http-equiv" => "X-UA-Compatible", :content => "IE=edge,chrome=1"}
-    %meta{:name => "viewport", :content => "width=device-width, initial-scale=1, maximum-scale=1"}
-    %title DayScore.net - Reinforce positive habits by keeping score
-    %link{:rel => "shortcut icon", :href => "/assets/favicon.ico"}    
-    = stylesheet_link_tag "application", :media => "all"
-    = javascript_include_tag "application"
-    = csrf_meta_tags
+  - cache do 
+    %head
+      %meta{:charset => "utf-8"}
+      %meta{"http-equiv" => "X-UA-Compatible", :content => "IE=edge,chrome=1"}
+      %meta{:name => "viewport", :content => "width=device-width, initial-scale=1, maximum-scale=1"}
+      %title DayScore.net - Reinforce positive habits by keeping score
+      %link{:rel => "shortcut icon", :href => "/assets/favicon.ico"}    
+      = stylesheet_link_tag "application", :media => "all"
+      = javascript_include_tag "application"
+      = csrf_meta_tags
+      :javascript
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29268598-4']);
+        _gaq.push(['_trackPageview']);
 
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
   %body
     #main{:role => "main"}
       .container  
-        = yield
-        %footer.footer
+        %header.jumbotron.subhead
           .row
             .span12
-              .pull-right
-                &copy; 2012 
-                = link_to 'Peter Ellis Jones', 'http://twitter.com/_ukoki_'
+              %h1 DayScore
+              %p.lead 
+                Reinforce positive habits by keeping score. 
+                %br
+                - link = 'http://dayscore.net' + home_path(@user.rand_str)
+                = link_to 'Bookmark this page', link, class: 'bookmark-link'
+                and come back tomorrow to update your score.
+        = yield
+        - cache do
+          %footer.footer
+            .row
+              .span12
+                .pull-right
+                  &copy; 2012 
+                  = link_to 'Peter Ellis Jones', 'http://twitter.com/_ukoki_'
     :javascript
       window.user_random_string = "#{@user.rand_str}";
