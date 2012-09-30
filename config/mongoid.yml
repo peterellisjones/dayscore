@@ -70,4 +70,5 @@ test:
 production:
   uri:  <%= ENV['MONGOLAB_URI'] %>
   sessions:
-    database: dayscore_production
+    default:
+      uri:  <%= ENV['MONGOLAB_URI'] %>
