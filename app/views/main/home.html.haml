@@ -1,0 +1,49 @@
+%header.jumbotron.subhead
+  .row
+    .span12
+      %h1 DayScore.net
+      %p.lead 
+        Reinforce positive habits by keeping score. 
+        %br
+        - link = 'http://dayscore.net' + home_path(@user.rand_str)
+        = link_to 'Bookmark this link', link, class: 'bookmark-link'
+        and come back tomorrow to update your score.
+.row
+  .span8
+    .things
+      %p.intro 
+        Today I...
+        %i (click all that apply)
+      - todays_things = @user.todays_things
+      - active_hash = Hash[todays_things.collect {|v| [v['name'], v['_id']] }]
+      - @user.thing_templates.each do |tt|
+        .thing
+          - if active_hash.has_key? tt.name
+            %div.icon
+              %i.icon-ok
+            %a.name.active{id: active_hash[tt.name]}= tt.name
+          - else
+            %div.icon
+            %a.name.inactive{id: tt._id}= tt.name
+          %p.buttons
+            %a.edit edit
+            %a.delete delete
+      %p
+        %a.add-thing add more
+  .span4
+    .scores
+      %p.intro 
+        Score
+      .score.today
+        %h1= todays_things.count
+      .score.this-week{style: "display:none;"}
+        %h1= @user.points_this_week
+      .score.this-month{style: "display:none;"}
+        %h1= @user.points_this_month
+      .score.all-time{style: "display:none;"}
+        %h1= @user.points_all_time
+      .buttons
+        %a.period.today.active today
+        %a.period.this-week this week
+        %a.period.this-month this month
+        %a.period.all-time total

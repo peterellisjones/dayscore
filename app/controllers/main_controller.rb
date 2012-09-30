@@ -1,0 +1,60 @@
+class MainController < ApplicationController
+  before_filter :get_user, except: [:home, :create_user]
+  before_filter :update_user_time_diff, except: [:home, :create_user]
+
+  def home
+    @user = User.where(rand_str: params[:user_id]).first
+    if @user == nil
+      create_user
+    end
+  end
+
+  def create_user
+    user = User.create!
+    redirect_to home_path(user.uri)
+  end
+
+  def get_user
+    @user = User.where(rand_str: params[:user_id]).first
+    if @user == nil
+      render :json => "Couldn't find user", :status => :unprocessable_entity and return
+    end
+  end
+
+  def update_user_time_diff
+    if params[:now]
+      @user.update_user_time_diff params[:now]
+    end
+  end
+
+  def create_thing
+    thing_template = @user.thing_templates.where(id: params[:template_id]).first
+    if thing_template == nil
+      render :json => "Couldn't find thing template", :status => :unprocessable_entity and return
+    end
+    thing = @user.create_thing(thing_template)
+    render :json => thing
+  end
+
+  def destroy_thing
+    thing = @user.things.where(id: params[:thing_id]).first
+    if thing == nil
+      render :json => "Couldn't find thing", :status => :unprocessable_entity and return
+    end
+    thing_template = @user.thing_templates.where(name: thing.name).first
+    if thing_template == nil
+      render :json => "Couldn't find thing template", :status => :unprocessable_entity and return
+    end
+    thing.destroy
+    render :json => thing_template
+  end
+
+  def destroy_template
+    template = @user.thing_templates.where(id: params[:template_id]).first
+    if template == nil
+      render :json => "Couldn't find template", :status => :unprocessable_entity and return
+    end
+    template.destroy
+    render :json => { _id: params[:template_id] }
+  end
+end
