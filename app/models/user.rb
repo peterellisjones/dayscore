@@ -1,7 +1,6 @@
 class User
   include Mongoid::Document
 
-  before_create :generate_rand_str
   before_create :set_default_thing_templates
   before_create :set_created_at
 
@@ -22,18 +21,13 @@ class User
     # don't need to save since this model will be saved elsewhere
   end
 
-  # rand_str is a random string that is used to create the url in the form of
-  # /rand_str
-  field :rand_str, type: String
-  index({ rand_str: 1 }, { unique: true, name: "rand_str_index" })
+  field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
 
-  def generate_rand_str
-    chars = [('a'..'z'),('A'..'Z'),('0'..'9')].map {|i| i.to_a}.flatten
-    self.rand_str = (0...20).map { chars[rand(chars.length)] }.join
-  end
+  #index({ _id: 1 }, { unique: true, name: "_id_index" })
 
-  def uri
-    self.rand_str
+  def get_random_string
+    chars = [('a'..'z'),('0'..'9')].map {|i| i.to_a}.flatten
+    str = (0...20).map { chars[rand(chars.length)] }.join
   end
 
   # thing is something the user has done

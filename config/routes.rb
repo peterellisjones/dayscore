@@ -11,6 +11,6 @@ Habit::Application.routes.draw do
   post ':user_id/template/:template_id/edit' => 'main#edit_template'
 
   # misc
-  get ':user_id' => 'main#home', :as => :home
+  get ':user_id' => 'main#home', :as => :user
   root :to => 'main#create_user'
 end

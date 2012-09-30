@@ -3,24 +3,34 @@ class MainController < ApplicationController
   before_filter :update_user_time_diff, only: :create_thing
 
   def home
-    @user = User.where(rand_str: params[:user_id]).first
-    if @user == nil
-      create_user
+    Rails.logger.info "FINDING USER WITH ID: #{params[:user_id]}"
+    begin
+      @user = User.where(rand_str: params[:user_id]).first
+      Rails.logger.info "FOUND USER #{@user.inspect}"
+    rescue
+      Rails.logger.info "DIDN'T FIND USER #{@user.inspect}"
+      create_user   
     end
   end
 
   def create_user
-    user = User.create!
-    Rails.logger.error "Couldn't create user" unless user
-    if Rails.env == 'development'
-      user.create_test_data
+    Rails.logger.info "CREATING USER"
+    @user = User.create
+    #if Rails.env == 'development'
+    #  user.create_test_data
+    #end
+    Rails.logger.info "REDIRECTING USER #{@user.inspect}"
+    if @user 
+      redirect_to user_path(@user.rand_str)
+    else
+      Rails.logger.error "Couln't create user"
     end
-    redirect_to home_path(user.uri)
   end
 
   def get_user
-    @user = User.where(rand_str: params[:user_id]).first
-    if @user == nil
+    begin
+      @user = User.where(rand_str: params[:user_id]).first
+    rescue
       render :json => "Couldn't find user", :status => :unprocessable_entity and return
     end
   end

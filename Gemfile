@@ -23,6 +23,7 @@ group :development do
   gem "haml-rails"
   gem "hpricot"
   gem "ruby_parser"
+  gem 'quiet_assets'
 end
 
 group :production do
