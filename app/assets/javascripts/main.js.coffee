@@ -14,6 +14,12 @@ $ ->
     str = "rgb(#{Math.floor(rgb[0])}, #{Math.floor(rgb[1])}, #{Math.floor(rgb[2])})"
     return str
 
+  seconds_from_midnight = () ->
+    d = new Date()
+    s = d.getHours() * 60 * 60
+    s += d.getMinutes() * 60 
+    s += d.getSeconds() 
+
   change_points = (diff) ->
     for period in ['today', 'this-week', 'this-month', 'all-time']
       points = parseInt $(".score.#{period} h1").text()
@@ -55,7 +61,7 @@ $ ->
 
   destroy_thing_template = (template_id) ->
     url = "#{window.user_random_string}/template/#{template_id}/destroy"
-    $.post url, {now: new Date()}, (data, textStatus, jqXHR) ->
+    $.post url, {'seconds_from_midnight': seconds_from_midnight()}, (data, textStatus, jqXHR) ->
       $("##{data._id}").closest('.thing').slideUp("normal", () -> $(this).remove(); set_color();)
 
   set_inactive = (elem, callback = null) ->
@@ -78,7 +84,7 @@ $ ->
     template_id = $(elem).attr('id')
     console.log "add thing template id:#{template_id}"
     url = "#{window.user_random_string}/thing/#{template_id}/create"
-    $.post url, {'now': (new Date()).toJSON()}, (data, textStatus, jqXHR) ->
+    $.post url, {'seconds_from_midnight': seconds_from_midnight()}, (data, textStatus, jqXHR) ->
       thing_id = data._id
       # toggle active/inactive
       $("##{template_id}").addClass('active')

@@ -15,10 +15,12 @@ class User
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
-  def update_user_time_diff(user_now)
-    user_now = Time.parse(user_now)
-    self.time_diff = user_now - Time.now
-    # don't need to save since this model will be saved elsewhere
+  def update_user_time_diff(user_seconds_from_midnight)
+    now = Time.now
+    server_seconds_from_midnight = now.hour * 60 * 60 + now.min * 60 + now.sec
+    Rails.logger.info "USER: #{user_seconds_from_midnight} SERVER #{server_seconds_from_midnight}"
+    self.time_diff = user_seconds_from_midnight.to_i - server_seconds_from_midnight
+    self.save
   end
 
   field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
@@ -56,7 +58,12 @@ class User
   # returns what the day it is for the user
   # this is used to save the date in the users time frame
   def user_today
-    user_time = Time.now + time_diff
+    if self.time_diff != nil
+      user_time = Time.now + self.time_diff
+    else
+      user_time = Time.now
+    end
+    
     if user_time.hour < 3
       user_day = user_time.yesterday.midnight.to_date
     else
