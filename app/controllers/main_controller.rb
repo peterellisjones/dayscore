@@ -3,27 +3,18 @@ class MainController < ApplicationController
   before_filter :update_user_time_diff, only: [:create_thing, :create_template]
 
   def home
-    Rails.logger.info "FINDING USER WITH ID: #{params[:user_id]}"
     @user = User.where(rand_str: params[:user_id]).first
     unless @user
-      Rails.logger.info "DIDN'T FIND USER #{@user.inspect}"
       create_user   
-    else
-      Rails.logger.info "FOUND USER #{@user.inspect}"
     end
   end
 
   def create_user
-    Rails.logger.info "CREATING USER"
     @user = User.create
-    #if Rails.env == 'development'
-    #  user.create_test_data
-    #end
-    Rails.logger.info "REDIRECTING USER #{@user.inspect}"
     if @user 
       redirect_to user_path(@user.rand_str)
     else
-      Rails.logger.error "Couln't create user"
+      Rails.logger.error "Couldn't create user"
     end
   end
 

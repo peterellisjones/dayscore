@@ -65,7 +65,6 @@ $ ->
 
   set_inactive = (elem, callback = null) ->
     thing_id = $(elem).attr('id')
-    console.log "destroy thing id:#{thing_id}"
     url = "#{window.user_random_string}/thing/#{thing_id}/destroy"  
     $.post url, null, (data, textStatus, jqXHR) ->
       template_id = data._id
@@ -81,7 +80,6 @@ $ ->
 
   set_active = (elem) ->
     template_id = $(elem).attr('id')
-    console.log "add thing template id:#{template_id}"
     url = "#{window.user_random_string}/thing/#{template_id}/create"
     $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
       thing_id = data._id
@@ -104,8 +102,6 @@ $ ->
     set_color()
   
   reset_button_functionality = () ->
-    console.log "RESETING BUTTONS"
-
     # set functionality for buttons to show
     $('.thing .buttons').hide()
     $('.thing').unbind()
@@ -181,7 +177,6 @@ $ ->
     # set bookmark on click functionality
     $('.bookmark-link').unbind()
     $('.bookmark-link').click (e) ->
-      console.log 'click'
       e.preventDefault()
       bookmarkUrl = this.href
       bookmarkTitle = 'DayScore.net - Reinforce positive habits by keeping score'
@@ -247,8 +242,6 @@ $ ->
     point_options = {}
     if window.chart_data.length < 2
       point_options = { show: true, radius: 5, fill: true, fillColor: '#ACDBF5' }
-    if (slide == true)
-      console.log 'slide'
 
     daily_score = {}
     daily_score.label =  'daily score'
@@ -288,7 +281,6 @@ $ ->
 
     options = {xaxis: xaxis, yaxis: yaxis, grid: grid}
 
-    console.log options
     chart = $.plot($("#chart"), data, options)
       
     chart.draw()
