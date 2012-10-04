@@ -16,13 +16,12 @@ class User
   field :time_diff, type: Integer, default: 0
 
   def update_user_time_diff (user_timezone_offset_seconds)
-    # equation
-    # servertime + servertimezoneoffset = UTC
-    # usertime = UTC + usertimezoneoffset
+    # UTC = servertime - servertimezoneoffset
+    # usertime = UTC + usertimezoneoffset # since offset is inverse in JS!
     # servertime + servertimezoneoffset + usertimezoneoffset = usertime
     # servertime + timediff = usertime
     # timediff = usertimezoneoffset + servertimezoneoffset
-    self.time_diff = user_timezone_offset_seconds - Time.now.utc_offset
+    self.time_diff = user_timezone_offset_seconds + Time.now.utc_offset
     self.save
   end
 
