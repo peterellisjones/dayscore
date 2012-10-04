@@ -7,7 +7,7 @@ class User
   field :created_at, type: Date
 
   def set_created_at
-    self.created_at = Date.today
+    self.created_at = user_today
   end
 
   # time diff is the difference between the users local time and the server time in seconds
