@@ -75,7 +75,7 @@ class User
   end
 
   def todays_things
-    self.things.where(date: Date.today).entries
+    self.things.where(date: user_today).entries
   end
 
   def points_this_week
