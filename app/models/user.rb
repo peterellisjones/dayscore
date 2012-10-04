@@ -14,11 +14,6 @@ class User
   field :time_diff, type: Integer, default: 0
 
   def update_user_time_diff (user_timezone_offset_minutes)
-    # UTC = servertime - servertimezoneoffset
-    # usertime = UTC + usertimezoneoffset # since offset is inverse in JS!
-    # servertime + servertimezoneoffset + usertimezoneoffset = usertime
-    # servertime + timediff = usertime
-    # timediff = usertimezoneoffset + servertimezoneoffset
     self.time_diff = - user_timezone_offset_minutes * 60 
 
     if self.created_at == nil
@@ -116,6 +111,8 @@ class User
   end
 
   # returns chart data as mapping from JS timestamp to number of things that day.
+  # if the extremes of the chart have no data, it puts zeros there to enforce the
+  # length of the chart (ie from created_at to today)
   def chart_data
     thing_hash = {}
     self.things.each do |thing|
@@ -128,7 +125,7 @@ class User
     js_stamp = user_today.to_time.to_i * 1000
     thing_hash[js_stamp] ||= 0
 
-    # for created_at = 0
+    # force created_at = 0
     if self.created_at != nil
       js_stamp = self.created_at.to_time.to_i * 1000
       thing_hash[js_stamp] ||= 0
