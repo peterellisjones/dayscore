@@ -15,11 +15,14 @@ class User
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
-  def update_user_time_diff(user_seconds_from_midnight)
-    now = Time.now
-    server_seconds_from_midnight = now.hour * 60 * 60 + now.min * 60 + now.sec
-    Rails.logger.info "USER: #{user_seconds_from_midnight} SERVER #{server_seconds_from_midnight}"
-    self.time_diff = user_seconds_from_midnight.to_i - server_seconds_from_midnight
+  def update_user_time_diff (user_timezone_offset_seconds)
+    # equation
+    # servertime + servertimezoneoffset = UTC
+    # usertime = UTC + usertimezoneoffset
+    # servertime + servertimezoneoffset + usertimezoneoffset = usertime
+    # servertime + timediff = usertime
+    # timediff = usertimezoneoffset + servertimezoneoffset
+    self.time_diff = user_timezone_offset_seconds - Time.now.utc_offset
     self.save
   end
 

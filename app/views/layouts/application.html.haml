@@ -32,6 +32,7 @@
         = yield
         :javascript
           window.user_random_string = "#{@user.rand_str}";
+          window.server_time = new Date(#{Time.now.to_i * 1000});
         - cache('footer_and_javascript') do
           %footer.footer
             .row
