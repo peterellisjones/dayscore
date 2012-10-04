@@ -107,7 +107,6 @@ class User
 
   # returns chart data as mapping from JS timestamp to number of things that day.
   def chart_data
-    Rails.logger.info self.inspect
     thing_hash = {}
     self.things.each do |thing|
       js_stamp = thing.date.to_time.to_i * 1000
