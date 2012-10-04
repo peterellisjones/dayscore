@@ -1,6 +1,6 @@
 class MainController < ApplicationController
   before_filter :get_user, except: [:home, :create_user]
-  before_filter :update_user_time_diff, only: :create_thing
+  before_filter :update_user_time_diff, only: [:create_thing, :create_template]
 
   def home
     Rails.logger.info "FINDING USER WITH ID: #{params[:user_id]}"

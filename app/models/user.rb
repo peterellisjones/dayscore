@@ -15,13 +15,13 @@ class User
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
-  def update_user_time_diff (user_timezone_offset_seconds)
+  def update_user_time_diff (user_timezone_offset_minutes)
     # UTC = servertime - servertimezoneoffset
     # usertime = UTC + usertimezoneoffset # since offset is inverse in JS!
     # servertime + servertimezoneoffset + usertimezoneoffset = usertime
     # servertime + timediff = usertime
     # timediff = usertimezoneoffset + servertimezoneoffset
-    self.time_diff = Time.now.utc_offset - user_timezone_offset_seconds 
+    self.time_diff = Time.now.utc_offset - user_timezone_offset_minutes * 60 
     self.save
   end
 
@@ -66,6 +66,7 @@ class User
       user_time = Time.now
     end
     
+    # consider the day to change at 3AM 
     if user_time.hour < 3
       user_day = user_time.yesterday.midnight.to_date
     else
@@ -79,24 +80,24 @@ class User
   end
 
   def points_this_week
-    self.things.where(:date.gte => Date.today.at_beginning_of_week).count
+    self.things.where(:date.gte => user_today.at_beginning_of_week).count
   end
 
   def points_this_month
-    self.things.where(:date.gte => Date.today.at_beginning_of_month).count
+    self.things.where(:date.gte => user_today.at_beginning_of_month).count
   end
 
   def points_yesterday
-    self.things.where(date: Date.today.yesterday).count
+    self.things.where(date: user_today.yesterday).count
   end
 
   def points_last_week
-    last_week = Date.today.at_beginning_of_week - 1.week
+    last_week = user_today.at_beginning_of_week - 1.week
     self.things.where(:date.gte => last_week, :date.lte => last_week.at_end_of_week).count
   end
 
   def points_last_month
-    last_month = Date.today.at_beginning_of_month - 1.month
+    last_month = user_today.at_beginning_of_month - 1.month
     self.things.where(:date.gte => last_month, :date.lte => last_month.at_end_of_month).count
   end
 
@@ -114,7 +115,7 @@ class User
     end
 
     # force today = 0
-    js_stamp = Date.today.to_time.to_i * 1000
+    js_stamp = user_today.to_time.to_i * 1000
     thing_hash[js_stamp] ||= 0
 
     # for created_at = 0
