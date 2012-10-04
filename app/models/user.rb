@@ -26,7 +26,7 @@ class User
   end
 
   def user_created_at
-    (self.created_at + self.time_diff).to_date
+    (self.created_at + self.time_diff)
   end
 
   field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
@@ -123,7 +123,7 @@ class User
     thing_hash[js_stamp] ||= 0
 
     # for created_at = 0
-    js_stamp = user_created_at.to_time.to_i * 1000
+    js_stamp = self.created_at.to_time.to_i * 1000
     thing_hash[js_stamp] ||= 0
 
     thing_hash
