@@ -37,7 +37,7 @@ class MainController < ApplicationController
 
   def update_user_time_diff
     if params[:timezone_offset_minutes]
-      @user.update_user_time_diff params[:timezone_offset_minutes].to_i * 60
+      @user.update_user_time_diff params[:timezone_offset_minutes].to_i
     end
   end
 
