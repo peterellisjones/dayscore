@@ -2,12 +2,11 @@ class User
   include Mongoid::Document
 
   before_create :set_default_thing_templates
-  before_create :set_created_at
 
   field :created_at, type: Date
 
   def set_created_at
-    self.created_at = Time.now
+    self.created_at_datetime = Time.now
   end
 
   # time diff is the difference between the users local time and the server time in seconds
@@ -21,7 +20,10 @@ class User
     # servertime + servertimezoneoffset + usertimezoneoffset = usertime
     # servertime + timediff = usertime
     # timediff = usertimezoneoffset + servertimezoneoffset
-    self.time_diff = Time.now.utc_offset - user_timezone_offset_minutes * 60 
+    self.time_diff = Time.now.utc_offset + user_timezone_offset_minutes * 60 
+    if self.created_at == nil
+      self.created_at = user_today
+    end
     self.save
   end
 
@@ -123,8 +125,10 @@ class User
     thing_hash[js_stamp] ||= 0
 
     # for created_at = 0
-    js_stamp = self.created_at.to_time.to_i * 1000
-    thing_hash[js_stamp] ||= 0
+    if self.created_at != nil
+      js_stamp = self.created_at.to_time.to_i * 1000
+      thing_hash[js_stamp] ||= 0
+    end
 
     thing_hash
   end
