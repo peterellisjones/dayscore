@@ -3,10 +3,13 @@ class User
 
   before_create :set_default_thing_templates
 
+  # created_at is theoretically the date the user was created... in practise 
+  # we want this date in the user's time-zone so we don't actually create it
+  # until the first call to update_user_time_diff
   field :created_at, type: Date
 
-  # time diff is the difference between the users local time and the server time in seconds
-  # server time + time diff = local time
+  # time diff is the difference between the users local time and UTC in seconds
+  # UTC + time diff = local time
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
@@ -17,6 +20,7 @@ class User
     # servertime + timediff = usertime
     # timediff = usertimezoneoffset + servertimezoneoffset
     self.time_diff = - user_timezone_offset_minutes * 60 
+
     if self.created_at == nil
       self.created_at = user_today
     end
@@ -28,9 +32,13 @@ class User
   end
 
   field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
+  index "rand_str" => 1
 
-  #index({ _id: 1 }, { unique: true, name: "_id_index" })
-
+  # index({ _id: 1 }, { unique: true, name: "_id_index" })
+  # question... are 20 chars enough for security?
+  # this gives 26^20 possibilities, or 2 * 10^28
+  # answer.. yes
+  # since this uses a pseudorandom RNG, someone could in theory deduce subsequent strings
   def get_random_string
     chars = [('a'..'z'),('0'..'9')].map {|i| i.to_a}.flatten
     str = (0...20).map { chars[rand(chars.length)] }.join
@@ -59,7 +67,7 @@ class User
     thing
   end
 
-  # returns what the day it is for the user
+  # returns what day it is for the user
   # this is used to save the date in the users time frame
   def user_today
     if self.time_diff != nil
