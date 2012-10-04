@@ -10,6 +10,10 @@
       = stylesheet_link_tag "application", :media => "all"
       = csrf_meta_tags      
   %body
+    / 
+      server time: #{ Time.now }
+      user time: #{ Time.now + @user.time_diff}
+      user day: #{ @user.user_today }
     #main{:role => "main"}
       .container  
         %header.jumbotron.subhead
