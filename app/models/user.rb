@@ -7,7 +7,7 @@ class User
   field :created_at, type: Date
 
   def set_created_at
-    self.created_at = user_today
+    self.created_at = Time.now
   end
 
   # time diff is the difference between the users local time and the server time in seconds
@@ -23,6 +23,10 @@ class User
     # timediff = usertimezoneoffset + servertimezoneoffset
     self.time_diff = Time.now.utc_offset - user_timezone_offset_minutes * 60 
     self.save
+  end
+
+  def user_created_at
+    (self.created_at + self.time_diff).to_date
   end
 
   field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
@@ -119,7 +123,7 @@ class User
     thing_hash[js_stamp] ||= 0
 
     # for created_at = 0
-    js_stamp = self.created_at.to_time.to_i * 1000
+    js_stamp = user_created_at.to_time.to_i * 1000
     thing_hash[js_stamp] ||= 0
 
     thing_hash
