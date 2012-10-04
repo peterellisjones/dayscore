@@ -21,7 +21,7 @@ class User
     # servertime + servertimezoneoffset + usertimezoneoffset = usertime
     # servertime + timediff = usertime
     # timediff = usertimezoneoffset + servertimezoneoffset
-    self.time_diff = user_timezone_offset_seconds + Time.now.utc_offset
+    self.time_diff = Time.now.utc_offset - user_timezone_offset_seconds 
     self.save
   end
 
