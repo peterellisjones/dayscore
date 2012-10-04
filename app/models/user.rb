@@ -5,10 +5,6 @@ class User
 
   field :created_at, type: Date
 
-  def set_created_at
-    self.created_at_datetime = Time.now
-  end
-
   # time diff is the difference between the users local time and the server time in seconds
   # server time + time diff = local time
   # this is used for calculating when days change according to the user
@@ -20,7 +16,7 @@ class User
     # servertime + servertimezoneoffset + usertimezoneoffset = usertime
     # servertime + timediff = usertime
     # timediff = usertimezoneoffset + servertimezoneoffset
-    self.time_diff = Time.now.utc_offset + user_timezone_offset_minutes * 60 
+    self.time_diff = - user_timezone_offset_minutes * 60 
     if self.created_at == nil
       self.created_at = user_today
     end
@@ -67,9 +63,9 @@ class User
   # this is used to save the date in the users time frame
   def user_today
     if self.time_diff != nil
-      user_time = Time.now + self.time_diff
+      user_time = Time.now.utc + self.time_diff
     else
-      user_time = Time.now
+      user_time = Time.now.utc
     end
     
     # consider the day to change at 3AM 

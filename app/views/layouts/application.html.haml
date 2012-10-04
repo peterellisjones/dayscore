@@ -11,8 +11,8 @@
       = csrf_meta_tags      
   %body
     / 
-      server time: #{ Time.now }
-      user time: #{ Time.now + @user.time_diff}
+      server time (UTC): #{ Time.now.utc }
+      user time: #{ Time.now.utc + @user.time_diff}
       user day: #{ @user.user_today }
     #main{:role => "main"}
       .container  
@@ -32,7 +32,6 @@
         = yield
         :javascript
           window.user_random_string = "#{@user.rand_str}";
-          window.server_time = new Date(#{Time.now.to_i * 1000});
         - cache('footer_and_javascript') do
           %footer.footer
             .row
