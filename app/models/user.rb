@@ -13,13 +13,6 @@ class User
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
-  DEFAULT_THING_TEMPLATES = [
-    "woke up early",
-    "did 20 minutes of exercise",
-    "cleared my inbox",
-     "ate 3 nutritious meals"
-  ]
-
   def update_user_time_diff (user_timezone_offset_minutes)
     self.time_diff = - user_timezone_offset_minutes * 60 
 
@@ -36,7 +29,6 @@ class User
   field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
   index "rand_str" => 1
 
-  # index({ _id: 1 }, { unique: true, name: "_id_index" })
   # question... are 20 chars enough for security?
   # this gives 26^20 possibilities, or 2 * 10^28
   # answer.. yes
@@ -54,6 +46,13 @@ class User
   # a thing template is something the user
   # is trying to do regularly
   embeds_many :thing_templates
+
+  DEFAULT_THING_TEMPLATES = [
+    "woke up early",
+    "did 20 minutes of exercise",
+    "cleared my inbox",
+     "ate 3 nutritious meals"
+  ]
 
   def set_default_thing_templates
     DEFAULT_THING_TEMPLATES.each do |t|

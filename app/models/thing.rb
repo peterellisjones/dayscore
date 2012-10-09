@@ -1,4 +1,4 @@
-class Thing
+class Thing < ThingTemplate
   include Mongoid::Document
 
   field :name, type: String
