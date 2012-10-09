@@ -13,6 +13,13 @@ class User
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
+  DEFAULT_THING_TEMPLATES = [
+    "woke up early",
+    "did 20 minutes of exercise",
+    "cleared my inbox",
+     "ate 3 nutritious meals"
+  ]
+
   def update_user_time_diff (user_timezone_offset_minutes)
     self.time_diff = - user_timezone_offset_minutes * 60 
 
@@ -49,10 +56,9 @@ class User
   embeds_many :thing_templates
 
   def set_default_thing_templates
-    self.thing_templates << ThingTemplate.new(name: "woke up early")
-    self.thing_templates << ThingTemplate.new(name: "did 20 minutes of exercise")
-    self.thing_templates << ThingTemplate.new(name: "cleared my inbox")
-    self.thing_templates << ThingTemplate.new(name: "ate 3 nutritious meals")
+    DEFAULT_THING_TEMPLATES.each do |t|
+      self.thing_templates << ThingTemplate.new(name: t)
+    end
   end
 
   def create_thing(thing_template)
@@ -144,5 +150,23 @@ class User
       end
     end 
     self.save
+  end
+
+  def self.cleanup_old_users
+    cutoff = Date.today - 1.month
+    Rails.logger.info "Deleting users created on or before #{cutoff}"
+    total_users = User.count
+    User.each do |u|
+      # if older than a month...
+      if u.created_at != nil && u.created_at <= cutoff
+        # if only default things
+        if u.things.count == 4 && u.things.all? { |t| DEFAULT_THING_TEMPLATES.include? t.name }
+          puts "DELETING USER #{u.inspect}"
+          u.destroy
+        end
+      end
+    end
+    deleted_users = total_users - User.count
+    Rails.logger.info "Deleted #{deleted_users}/#{total_users} (#{100 * deleted_users.to_f/total_users}%)"
   end
 end
