@@ -334,7 +334,7 @@ $ ->
   $('.add-thing form').hide()
   $('.thing .buttons').hide()
   set_color()
+  reset_button_functionality()
   window.process_chart_data()
   window.draw_chart()
-  reset_button_functionality()
   
