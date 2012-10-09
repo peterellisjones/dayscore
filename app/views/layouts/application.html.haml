@@ -8,7 +8,8 @@
       %title DayScore.net - Reinforce positive habits by keeping score
       %link{:rel => "shortcut icon", :href => "/assets/favicon.ico"}    
       = stylesheet_link_tag "application", :media => "all"
-      = csrf_meta_tags      
+      = csrf_meta_tags   
+      = javascript_include_tag "application"   
   %body
     / 
       server time (UTC): #{ Time.now.utc }
@@ -26,9 +27,57 @@
                 - link = 'http://dayscore.net' + user_path(@user.rand_str)
                 = link_to 'Bookmark this page', link, class: 'bookmark-link'
                 and come back tomorrow to update your score.
-            .span5
-        = yield
+        .row
+          .span8
+            .things
+              %p.intro 
+                Today I...
+                %i (click all that apply)
+              - todays_things = @user.todays_things
+              - active_hash = Hash[todays_things.collect {|v| [v['name'], v['_id']] }]
+              - @user.thing_templates.each do |tt|
+                .thing
+                  - if active_hash.has_key? tt.name
+                    %div.icon
+                      %i.icon-ok
+                    %a.name.active{id: active_hash[tt.name]}= tt.name
+                  - else
+                    %div.icon
+                    %a.name.inactive{id: tt._id}= tt.name
+                  %form.form-inline{style: "display:none;"}
+                    %input.input-medium{value: tt.name, type: 'text'}
+                    %button.btn Submit
+                  %p.buttons
+                    %a.edit edit
+                    %a.delete delete
+            .add-thing
+              %a add more
+              %form.form-inline
+                %input.input-medium{type: 'text'}
+                %button.btn Submit
+          .span4
+            .scores
+              %p.intro 
+                Score
+              .score.today
+                %h1= todays_things.count
+              - {'this-week' => @user.points_this_week, 'this-month' => @user.points_this_month, 'all-time' => @user.points_all_time}.each do |k, v|
+                - clss = k + (v > 1000 ? ' thousands' : (v > 100 ? ' hundreds' : (v > 10 ? ' tens' : '')))
+                .score{class: clss, style: "display:none;"}
+                  %h1= v
+              .buttons
+                %a.period.today.active today
+                |
+                %a.period.this-week this week
+                |
+                %a.period.this-month this month
+                |
+                %a.period.all-time total
+          .span12
+            #chart
+            #chard-overview
         :javascript
+          window.chart_data_hash = eval(#{@user.chart_data.to_json});
           window.user_random_string = "#{@user.rand_str}";
         - cache('footer_and_javascript') do
           %footer.footer
@@ -48,4 +97,3 @@
               ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
               var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
             })();
-          = javascript_include_tag "application"

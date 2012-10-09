@@ -61,7 +61,8 @@ $ ->
   destroy_thing_template = (template_id) ->
     url = "#{window.user_random_string}/template/#{template_id}/destroy"
     $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
-      $("##{data._id}").closest('.thing').slideUp("normal", () -> $(this).remove(); set_color();)
+      $("##{data._id}").closest('.thing').remove()
+      set_color()
 
   set_inactive = (elem, callback = null) ->
     thing_id = $(elem).attr('id')

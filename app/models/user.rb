@@ -26,6 +26,7 @@ class User
     (self.created_at + self.time_diff)
   end
 
+  # rand_str is a random string used as the user ID
   field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
   index "rand_str" => 1
 
@@ -40,6 +41,7 @@ class User
 
   # thing is something the user has done
   # it has a name and an associated date
+  # index on date to help with points calculation
   embeds_many :things
   index({ "things.date" => 1 }, { name: "things_date_index" })
 
@@ -51,8 +53,7 @@ class User
     "woke up early",
     "did 20 minutes of exercise",
     "cleared my inbox",
-     "ate 3 nutritious meals"
-  ]
+     "ate 3 nutritious meals"]
 
   def set_default_thing_templates
     DEFAULT_THING_TEMPLATES.each do |t|
@@ -120,6 +121,7 @@ class User
   # length of the chart (ie from created_at to today)
   def chart_data
     thing_hash = {}
+    # create hash index by JS time stamp (ie milliseconds since 1970)
     self.things.each do |thing|
       js_stamp = thing.date.to_time.to_i * 1000
       thing_hash[js_stamp] ||= 0
@@ -139,7 +141,7 @@ class User
     thing_hash
   end
 
-  # test data - 
+  # test data - create some random things
   def create_test_data
     Date.today.downto(Date.today - 2.months) do |day|
       self.thing_templates.each do |t|
