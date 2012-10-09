@@ -61,8 +61,21 @@ $ ->
   destroy_thing_template = (template_id) ->
     url = "#{window.user_random_string}/template/#{template_id}/destroy"
     $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
-      $("##{data._id}").closest('.thing').remove()
-      set_color()
+      #$("##{data._id}").closest('.thing').slideUp("fast", () -> $(this).remove(); set_color();)
+      #$("##{data._id}").closest('.thing').remove()
+      #set_color()
+      div = $("##{data._id}").parents(".thing")
+      div.css('height', div.height())
+      div.animate {opacity: 0 },{duration: 200, complete: () ->
+        $(this).slideUp 200, () ->
+          $(this).remove()
+          set_color()
+      }
+      #div.closest('.thing').animate({
+      #    opacity: 'toggle'},
+      #    {duration: 200,
+      #    queue: false},
+      #    () -> $(this).remove(); set_color();)
 
   set_inactive = (elem, callback = null) ->
     thing_id = $(elem).attr('id')
