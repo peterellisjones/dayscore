@@ -61,9 +61,6 @@ $ ->
   destroy_thing_template = (template_id) ->
     url = "#{window.user_random_string}/template/#{template_id}/destroy"
     $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
-      #$("##{data._id}").closest('.thing').slideUp("fast", () -> $(this).remove(); set_color();)
-      #$("##{data._id}").closest('.thing').remove()
-      #set_color()
       div = $("##{data._id}").parents(".thing")
       div.css('height', div.height())
       div.animate {opacity: 0 },{duration: 200, complete: () ->
@@ -71,11 +68,6 @@ $ ->
           $(this).remove()
           set_color()
       }
-      #div.closest('.thing').animate({
-      #    opacity: 'toggle'},
-      #    {duration: 200,
-      #    queue: false},
-      #    () -> $(this).remove(); set_color();)
 
   set_inactive = (elem, callback = null) ->
     thing_id = $(elem).attr('id')
@@ -109,8 +101,8 @@ $ ->
   prepend_thing_template = (tt) ->
     html = "<div class=\"thing\"><div class=\"icon\"></div><a id=\"#{tt._id}\" class=\"inactive name\">#{tt.name}</a><form class=\"form form-inline\"><input class=\"input-medium\" type=\"text\" value=\"#{tt.name}\"><button class=\"btn\">Submit</button></form><p class=\"buttons\"><a class=\"edit\">edit</a><a class=\"delete\">delete</a></p></div>"
     $(html).appendTo('.things')
-    $("##{tt._id}").closest('.thing').find('form').hide()
-    $("##{tt._id}").closest('.thing').find('.buttons').hide()
+    $("##{tt._id}").closest('.thing').find('form').fadeOut(200)
+    $("##{tt._id}").closest('.thing').find('.buttons').fadeOut(200)
     $('.add-thing a').click()
     reset_button_functionality()
     set_color()
@@ -163,7 +155,7 @@ $ ->
 
       $(this).closest('.thing').find('.name').toggle()
       $(this).closest('.thing').find('form').toggle()
-      $(this).closest('.thing').find('.buttons').show()
+      $(this).closest('.thing').find('.buttons').fadeIn(200)
 
     $('.add-thing form').unbind()
     $('.add-thing form').submit (e) ->
