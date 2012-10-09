@@ -155,13 +155,15 @@ $ ->
 
       $(this).closest('.thing').find('.name').toggle()
       $(this).closest('.thing').find('form').toggle()
-      $(this).closest('.thing').find('.buttons').fadeIn(200)
+      $(this).closest('.thing').find('.buttons').show()
 
     $('.add-thing form').unbind()
     $('.add-thing form').submit (e) ->
       e.preventDefault()
       value = $(this).find('input').val()
-      if value and value != ''
+      if value == ''
+        $('.add-thing a').click()
+      else if value
         url = "#{window.user_random_string}/template/create"
         data = {name: value}
         $.post url, data, (ret, textStatus, jqXHR) ->

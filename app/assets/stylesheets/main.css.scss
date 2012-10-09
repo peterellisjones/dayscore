@@ -51,7 +51,7 @@ header {
     a.inactive {
       color: #555;
     }
-    min-height: 30px; 
+    min-height: 35px; 
     padding-bottom: 15px; 
     .icon {
       width: 30px;
@@ -63,6 +63,10 @@ header {
     }
     input {
       width: 450px;
+    }
+    form {
+      height: 35px;
+      margin-bottom: 0px;
     }
   }
 
@@ -79,6 +83,7 @@ header {
   a {
     cursor: pointer;
   }
+  min-height: 35px;
 }
 
 .footer {
