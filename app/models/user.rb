@@ -15,11 +15,9 @@ class User
 
   def update_user_time_diff (user_timezone_offset_minutes)
     self.time_diff = - user_timezone_offset_minutes * 60 
-
     if self.created_at == nil
       self.created_at = user_today
     end
-    self.save
   end
 
   def user_created_at
