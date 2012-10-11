@@ -1,6 +1,9 @@
 class ThingTemplate
   include Mongoid::Document
 
+  # a thing_template describes something
+  # the user wants to do regularly
+
   field :name, type: String
   field :date, type: Date
 

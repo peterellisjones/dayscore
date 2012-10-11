@@ -5,10 +5,12 @@ class User
 
   # created_at is theoretically the date the user was created... in practise 
   # we want this date in the user's time-zone so we don't actually create it
-  # until the first call to update_user_time_diff
+  # until the first call to update_user_time_diff (which is when client-side code
+  # sends the user's time)
+  # note Date and not Datetime, since we want to round JS timestamps to nearest 24 hours
   field :created_at, type: Date
 
-  # time diff is the difference between the users local time and UTC in seconds
+  # time diff is the difference between the user's local time and UTC in seconds
   # UTC + time diff = local time
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
@@ -28,10 +30,14 @@ class User
   field :rand_str, type: String, pre_processed: true, default: -> { get_random_string }
   index "rand_str" => 1
 
-  # question... are 20 chars enough for security?
-  # this gives 26^20 possibilities, or 2 * 10^28
-  # answer.. yes
-  # since this uses a pseudorandom RNG, someone could in theory deduce subsequent strings
+  # question... are 20 chars enough?
+  # this gives 36^20 possibilities, or approx 10^31
+  # server handles maybe 10^2 req/sec
+  # max users say: 10^5
+  # so 10^31 / (10^5 * 10^2) = rough estimate 10^24 seconds for a collision
+  # answer.. yes - ie, no chance of collision
+  # but... since this uses a pseudorandom RNG, someone could in theory deduce subsequent strings
+  # but they'd have to really want it.. and the data is going to be pretty useless anyway
   def get_random_string
     chars = [('a'..'z'),('0'..'9')].map {|i| i.to_a}.flatten
     str = (0...20).map { chars[rand(chars.length)] }.join
@@ -156,9 +162,9 @@ class User
     Rails.logger.info "Deleting users created on or before #{cutoff}"
     total_users = User.count
     User.each do |u|
-      # if older than a month...
+      # if created over a month ago...
       if u.created_at != nil && u.created_at <= cutoff
-        # if only default things
+        # if user didn't make any changes
         if u.things.count == 4 && u.things.all? { |t| DEFAULT_THING_TEMPLATES.include? t.name }
           puts "DELETING USER #{u.inspect}"
           u.destroy

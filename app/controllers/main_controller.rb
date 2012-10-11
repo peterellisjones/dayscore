@@ -18,6 +18,7 @@ class MainController < ApplicationController
     end
   end
 
+  # called before all ajax requests, sets @user
   def get_user
     begin
       @user = User.where(rand_str: params[:user_id]).first
@@ -26,6 +27,7 @@ class MainController < ApplicationController
     end
   end
 
+  # called before all ajax requests, sets user's time difference
   def update_user_time_diff
     if params[:timezone_offset_minutes]
       @user.update_user_time_diff params[:timezone_offset_minutes].to_i
@@ -82,6 +84,7 @@ class MainController < ApplicationController
       render :json => "No name!", :status => :unprocessable_entity and return
     end
     thing.update_attribute(:name, params[:name])
+    
     # need to update template too!
     thing_template = @user.thing_templates.where(name: old_name).first
     thing_template.update_attribute(:name, params[:name])

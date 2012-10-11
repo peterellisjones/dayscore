@@ -1,23 +1,19 @@
 $ ->
+  window.chart_data = []
+
   # check user random string exists
-  if window.user_random_string?
-    console.log "user random string: #{window.user_random_string}"
-  else
+  if !user_random_string?
     throw "user random string not found"
 
   # returns color between red (p = 0.0) and green (p = 1.0)
-  window.get_color = (p) -> 
+  # hsvToRgb(H, S, V) defined in color.js
+  get_color = (p) -> 
     H = 0.33 * p
     S = 1.0
     V = 0.9
     rgb = hsvToRgb(H, S, V)
     str = "rgb(#{Math.floor(rgb[0])}, #{Math.floor(rgb[1])}, #{Math.floor(rgb[2])})"
     return str
-
-  #seconds_from_midnight = (d) ->
-  #  s = d.getHours() * 60 * 60
-  #  s += d.getMinutes() * 60 
-  #  s += d.getSeconds() 
 
   change_points = (diff) ->
     for period in ['today', 'this-week', 'this-month', 'all-time']
@@ -39,17 +35,15 @@ $ ->
     possible_points = parseFloat $('.thing').length
     ratio = points / possible_points
     # set color for today's score
-    $(".score.today h1").css("color", "#{window.get_color(ratio)}")
+    $(".score.today h1").css("color", "#{get_color(ratio)}")
 
   increment_points = () ->
     change_points 1
-    window.update_chart_data 1
-    
+    update_chart_data 1
 
   decrement_points = () ->
     change_points -1
-    window.update_chart_data -1
-
+    update_chart_data -1
 
   hover_in = (e) ->
     if $(this).closest('.thing').find('.name').is(':visible')
@@ -59,7 +53,7 @@ $ ->
     $(this).find('.buttons').hide()
 
   destroy_thing_template = (template_id) ->
-    url = "#{window.user_random_string}/template/#{template_id}/destroy"
+    url = "#{user_random_string}/template/#{template_id}/destroy"
     $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
       div = $("##{data._id}").parents(".thing")
       div.css('height', div.height())
@@ -71,7 +65,7 @@ $ ->
 
   set_inactive = (elem, callback = null) ->
     thing_id = $(elem).attr('id')
-    url = "#{window.user_random_string}/thing/#{thing_id}/destroy"  
+    url = "#{user_random_string}/thing/#{thing_id}/destroy"  
     $.post url, null, (data, textStatus, jqXHR) ->
       template_id = data._id
       # toggle active/inactive
@@ -86,7 +80,7 @@ $ ->
 
   set_active = (elem) ->
     template_id = $(elem).attr('id')
-    url = "#{window.user_random_string}/thing/#{template_id}/create"
+    url = "#{user_random_string}/thing/#{template_id}/create"
     $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
       thing_id = data._id
       # toggle active/inactive
@@ -146,9 +140,9 @@ $ ->
       if value and value != '' and value != old_value
         id = $(this).closest('.thing').find('.name').attr('id')
         if $("##{id}").hasClass('active')
-          url = "#{window.user_random_string}/thing/#{id}/edit"
+          url = "#{user_random_string}/thing/#{id}/edit"
         else
-          url = "#{window.user_random_string}/template/#{id}/edit"
+          url = "#{user_random_string}/template/#{id}/edit"
         data = {name: value, old_name: old_value}
         $.post url, data, (ret, textStatus, jqXHR) ->
           $("##{ret._id}").text(ret.name)
@@ -164,7 +158,7 @@ $ ->
       if value == ''
         $('.add-thing a').click()
       else if value
-        url = "#{window.user_random_string}/template/create"
+        url = "#{user_random_string}/template/create"
         data = {name: value}
         $.post url, data, (ret, textStatus, jqXHR) ->
           prepend_thing_template ret
@@ -194,11 +188,11 @@ $ ->
         alert('Press CTRL-D to bookmark this page.')
         return false
 
-      if (window.sidebar) 
-        window.sidebar.addPanel(bookmarkTitle, bookmarkUrl,"")
-      else if( window.external || document.all)
-        window.external.AddFavorite( bookmarkUrl, bookmarkTitle)
-      else if(window.opera)
+      if (sidebar) 
+        sidebar.addPanel(bookmarkTitle, bookmarkUrl,"")
+      else if( external || document.all)
+        external.AddFavorite( bookmarkUrl, bookmarkTitle)
+      else if(opera)
         $("a.jQueryBookmark").attr("href",bookmarkUrl);
         $("a.jQueryBookmark").attr("title",bookmarkTitle);
         $("a.jQueryBookmark").attr("rel","sidebar");
@@ -217,38 +211,49 @@ $ ->
       $('.score').hide()
       $(".score.#{period}").show()
 
-  # calculate seven day moving average
-  window.calc_sma = (n) ->
+  # calculate n-day moving average
+  calc_ma = (n) ->
     if window.chart_data.length < n
       return []
     # calculate first point
-    sum_n = window.chart_data[0...n].map((x) -> parseFloat(x[1]))
-    sum_time = window.chart_data[0...n].map((x) -> parseFloat(x[0]))
-    mov_average = []
-    mov_average.push [(sum_time.reduce (x,y) -> x + y) / n, (sum_n.reduce (x,y) -> x + y) / n]
-    # calculate middle points
+    # y value
+    val = window.chart_data[0...n].
+      map((x) -> parseFloat(x[1])).
+      reduce((x,y) -> x + y) / n
+    # if n is even, interpolate to get median x value
+    if n % 2 == 0
+      time = (window.chart_data[Math.floor(n/2)-1][0] + window.chart_data[Math.floor(n/2)][0]) / 2
+    else
+      time = window.chart_data[Math.floor(n/2)][0]
+
+    mov_average = [[time, val]]
+
+    # calculate rest
+    # uses fact that moving average at x+1 is
+    # M(x+1) = M(x) - (D(b) - D(a)) / n
+    # where D(x) is the data series, a is the point being removed from the moving average,
+    # and b is the point being added to the moving average
     for point in window.chart_data[n..window.chart_data.length]
-      val = parseFloat(point[1])
-      time = point[0]
-      sum_n.shift()
-      sum_n.push(val)
-      sum_time.shift()
-      sum_time.push(time)
-      mov_average.push([(sum_time.reduce (x,y) -> x + y) / n, (sum_n.reduce (x,y) -> x + y) / n])
-    # calculate last point
-    sum_n = window.chart_data[(window.chart_data.length-n)...window.chart_data.length].map((x) -> parseFloat(x[1]))
-    sum_time = window.chart_data[(window.chart_data.length-n)...window.chart_data.length].map((x) -> parseFloat(x[0]))
-    #mov_average.push [(sum_time.reduce (x,y) -> x + y) / n, (sum_n.reduce (x,y) -> x + y) / n]
+      # update y values
+      new_val = parseFloat(point[1])
+      old_val = window.chart_data[mov_average.length - 1][1]
+      # add a day
+      time += 24*60*60*1000
+      # update moving average
+      mov_average.push([time, mov_average[mov_average.length - 1][1] + (new_val - old_val) / n])
+
     mov_average
 
-  # draw chart
-  window.draw_chart = (slide = false) ->
-    window.sma_seven = window.calc_sma(7)
-    window.sma_thirty = window.calc_sma(30)
+  # draw chart, uses jquery.flot.js
+  draw_chart = () ->
+    sma_seven = calc_ma(7)
+    sma_thirty = calc_ma(30)
     if window.chart_data.length < 1
-      return
+      # don't draw empty chart
+      return 
     point_options = {}
-    if window.chart_data.length < 2
+    if window.chart_data.length == 1
+      # if only one point, draw spot
       point_options = { show: true, radius: 5, fill: true, fillColor: '#ACDBF5' }
 
     daily_score = {}
@@ -260,13 +265,13 @@ $ ->
 
     seven_day_ma = {}
     seven_day_ma.label = '7 day moving average'
-    seven_day_ma.data = window.sma_seven
+    seven_day_ma.data = sma_seven
     seven_day_ma.color = '#2FA4E7'
     seven_day_ma.lines = {lineWidth: 5 }
 
     thirty_day_ma = {}
     thirty_day_ma.label = '30 day moving average'
-    thirty_day_ma.data = window.sma_thirty
+    thirty_day_ma.data = sma_thirty
     thirty_day_ma.color = '#317EAC'
     thirty_day_ma.lines = {lineWidth: 5 }
 
@@ -294,7 +299,7 @@ $ ->
     chart.draw()
 
   # updates todays chart data by +- 1
-  window.update_chart_data = (val) ->
+  update_chart_data = (val) ->
     today = (new Date())
     today.setHours(0,0,0,0)
     today = today.getTime()
@@ -302,18 +307,21 @@ $ ->
       window.chart_data[window.chart_data.length-1][1] -= 1
     else if val == 1
       window.chart_data[window.chart_data.length-1][1] += 1
+    else 
+      throw "invalid value"
 
-    window.sma_seven = window.calc_sma(7)
-    window.sma_thirty = window.calc_sma(30)
-    window.draw_chart()
+    sma_seven = calc_ma(7)
+    sma_thirty = calc_ma(30)
+    draw_chart()
 
   # process data to add missing days
-  window.process_chart_data = () ->
-    if chart_data_hash.length < 1
+  process_chart_data = () ->
+    if window.chart_data_hash.length < 1
       throw "NO CHART DATA HASH"
     start_date = (new Date()).getTime() + 24*2*60*60*1000
     end_date = 0
-    for k, v of chart_data_hash
+    # find range
+    for k, v of window.chart_data_hash
       if k < start_date
         start_date = k
       if k > end_date
@@ -321,10 +329,11 @@ $ ->
     window.chart_data = []
     start_date = parseInt start_date
     end_date = parseInt end_date
+    # loop through date range, filling in blanks
     date = start_date
     while date <= end_date
-      if chart_data_hash[date]?
-        window.chart_data.push [date, chart_data_hash[date]]
+      if window.chart_data_hash[date]?
+        window.chart_data.push [date, window.chart_data_hash[date]]
       else
         window.chart_data.push [date, 0]
       date += 24*60*60*1000
@@ -333,8 +342,9 @@ $ ->
   $('.thing form').hide()
   $('.add-thing form').hide()
   $('.thing .buttons').hide()
+
   set_color()
   reset_button_functionality()
-  window.process_chart_data()
-  window.draw_chart()
+  process_chart_data()
+  draw_chart()
   

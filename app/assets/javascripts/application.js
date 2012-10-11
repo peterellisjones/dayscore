@@ -15,5 +15,4 @@
 //= require excanvas.min
 //= require color
 //= require jquery.flot
-//= require jquery.flot.selection
-//= require_tree .
+//= require main
