@@ -8,11 +8,17 @@ header {
   }
   padding-top: 60px;
   padding-bottom: 40px;
+  @media (max-width: 767px) {
+    padding-top: 20px;
+    padding-bottom: 10px;
+  }
   .lead {
     padding-top: 20px;
     font-size: 16px;
+    @media (max-width: 767px) {
+      font-size: 11px;
+    }
     color: #888;
-    margin-left: 5px;
     line-height: 1.2em;
   }
 }
@@ -20,12 +26,21 @@ header {
 .intro {
   font-size: 30px;
   font-weight: bold;
+  @media (max-width: 767px) {
+      font-size: 20px;
+  }
   i {
     color: #888;
     font-size: 16px;
     font-weight: normal;
+    @media (max-width: 767px) {
+      font-size: 11px;
+    }
   }
   padding-bottom: 10px;
+  @media (max-width: 767px) {
+    padding-bottom: 0px;
+  }
 }
 
 
@@ -34,9 +49,17 @@ header {
     position: relative;
     padding-top: 10px;
     padding-bottom: 10px;
+    @media (max-width: 767px) {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
     .name {
       font-size: 30px;
+      @media (max-width: 767px) {
+        font-size: 18px;
+      }
     }  
+    
     a:hover {
       cursor:pointer;
     }
@@ -47,6 +70,10 @@ header {
         padding-right: 10px;
       }
       margin-left: 30px;
+      @media (max-width: 767px) {
+        bottom: -8px;
+        font-size: 12px;
+      }
     }
     a.inactive {
       color: #555;
@@ -60,9 +87,16 @@ header {
       float: left;
       font-size: 20px;
       color: #157AB5;
+      @media (max-width: 767px) {
+        margin-top: 0px;
+        height: 25px;
+      }
     }
     input {
       width: 450px;
+      @media (max-width: 767px) {
+        width: 210px;
+      }
     }
     form {
       height: 35px;
@@ -81,8 +115,16 @@ header {
   padding-top: 10px;
   margin-bottom: 20px;
   padding-left: 30px;
+  @media (max-width: 767px) {
+    font-size: 15px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+  }
   input {
     width: 450px;
+    @media (max-width: 767px) {
+        width: 210px;
+      }
   }
   a {
     cursor: pointer;
@@ -94,6 +136,9 @@ header {
   margin-top: -50px;
   padding-bottom: 20px;
   color: #888;
+  @media (max-width: 767px) {
+     margin-top: -30px;
+  }
 }
 
 .scores {
@@ -102,6 +147,7 @@ header {
     font-size: 200px;
     padding-top: 60px;
     padding-bottom: 65px;
+    text-align: center;
   }
   .hundreds h1 {
     font-size: 140px;

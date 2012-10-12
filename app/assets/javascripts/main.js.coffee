@@ -212,6 +212,8 @@ $ ->
       $(".score.#{period}").show()
 
   # calculate n-day moving average
+  # assumes chart_data is format [[time, value],...]
+  # and no days missing or doubled
   calc_ma = (n) ->
     if window.chart_data.length < n
       return []
