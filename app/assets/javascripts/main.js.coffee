@@ -6,21 +6,18 @@ $ ->
     throw "user random string not found"
 
   # returns color between red (p = 0.0) and green (p = 1.0)
-  # hsvToRgb(H, S, V) defined in color.js
-  get_color = (p) -> 
-    H = 0.33 * p
-    S = 1.0
-    V = 0.9
-    rgb = hsvToRgb(H, S, V)
-    str = "rgb(#{Math.floor(rgb[0])}, #{Math.floor(rgb[1])}, #{Math.floor(rgb[2])})"
-    return str
+  # hsvToRgb(Hue, Sat, Val) defined in color.js
+  # used to change hue of score
+  calc_color = (p) -> 
+    rgb = hsvToRgb(0.33 * p, 1.0, 0.9)
+    "rgb(#{Math.floor(rgb[0])}, #{Math.floor(rgb[1])}, #{Math.floor(rgb[2])})"
 
   change_points = (diff) ->
     for period in ['today', 'this-week', 'this-month', 'all-time']
       points = parseInt $(".score.#{period} h1").text()
       points += diff
-      elem = $(".score.#{period} h1").removeClass()
-      elem.addClass("score #{period}")
+      elem = $(".score.#{period} h1").removeClass().addClass("score #{period}")
+      # add classes to change font-size based on digits
       if points > 1000
         elem.addClass('thousands')
       else if points > 100
@@ -35,7 +32,7 @@ $ ->
     possible_points = parseFloat $('.thing').length
     ratio = points / possible_points
     # set color for today's score
-    $(".score.today h1").css("color", "#{get_color(ratio)}")
+    $(".score.today h1").css("color", "#{calc_color(ratio)}")
 
   increment_points = () ->
     change_points 1
@@ -57,7 +54,7 @@ $ ->
     $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
       div = $("##{data._id}").parents(".thing")
       div.css('height', div.height())
-      div.animate {opacity: 0 },{duration: 200, complete: () ->
+      div.animate {opacity: 0 },{ duration: 200, complete: () ->
         $(this).slideUp 200, () ->
           $(this).remove()
           set_color()
@@ -93,6 +90,7 @@ $ ->
       increment_points()
 
   prepend_thing_template = (tt) ->
+    # todo: put this in an EJS template
     html = "<div class=\"thing\"><div class=\"icon\"></div><a id=\"#{tt._id}\" class=\"inactive name\">#{tt.name}</a><form class=\"form form-inline\"><input class=\"input-medium\" type=\"text\" value=\"#{tt.name}\"><button class=\"btn\">Submit</button></form><p class=\"buttons\"><a class=\"edit\">edit</a><a class=\"delete\">delete</a></p></div>"
     $(html).appendTo('.things')
     $("##{tt._id}").closest('.thing').find('form').fadeOut(200)
@@ -300,26 +298,18 @@ $ ->
       
     chart.draw()
 
-  # updates todays chart data by +- 1
+  # updates score for today by val, 
+  # then recalculates moving averages, and draws chart
   update_chart_data = (val) ->
-    today = (new Date())
-    today.setHours(0,0,0,0)
-    today = today.getTime()
-    if val == -1
-      window.chart_data[window.chart_data.length-1][1] -= 1
-    else if val == 1
-      window.chart_data[window.chart_data.length-1][1] += 1
-    else 
-      throw "invalid value"
-
+    window.chart_data[window.chart_data.length-1][1] += val
     sma_seven = calc_ma(7)
     sma_thirty = calc_ma(30)
     draw_chart()
 
   # process data to add missing days
   process_chart_data = () ->
-    if window.chart_data_hash.length < 1
-      throw "NO CHART DATA HASH"
+    if !window.chart_data_hash? || window.chart_data_hash.length < 1
+      throw "INVALID CHART DATA HASH"
     start_date = (new Date()).getTime() + 24*2*60*60*1000
     end_date = 0
     # find range
@@ -329,11 +319,9 @@ $ ->
       if k > end_date
         end_date = k
     window.chart_data = []
-    start_date = parseInt start_date
-    end_date = parseInt end_date
     # loop through date range, filling in blanks
-    date = start_date
-    while date <= end_date
+    date = parseInt start_date
+    while date <= parseInt end_date
       if window.chart_data_hash[date]?
         window.chart_data.push [date, window.chart_data_hash[date]]
       else

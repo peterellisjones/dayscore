@@ -62,6 +62,7 @@ class MainController < ApplicationController
       render :json => "Couldn't find thing template", :status => :unprocessable_entity and return
     end
     thing.destroy
+    # display template so client can switch thing for template
     render :json => thing_template
   end
 
@@ -71,6 +72,7 @@ class MainController < ApplicationController
       render :json => "Couldn't find template", :status => :unprocessable_entity and return
     end
     template.destroy
+    # return ID so client can delete from screen
     render :json => { _id: params[:template_id] }
   end
 
@@ -79,15 +81,15 @@ class MainController < ApplicationController
     old_name = thing.name
     if thing == nil
       render :json => "Couldn't find thing", :status => :unprocessable_entity and return
-    end
-    if params[:name] == nil
+    elsif params[:name] == nil
       render :json => "No name!", :status => :unprocessable_entity and return
     end
-    thing.update_attribute(:name, params[:name])
     
-    # need to update template too!
+    # need to update template too
     thing_template = @user.thing_templates.where(name: old_name).first
     thing_template.update_attribute(:name, params[:name])
+
+    thing.update_attributes(name: params[:name], thing_template_id: thing_template._id)
 
     render :json => thing
   end

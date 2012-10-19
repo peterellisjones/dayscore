@@ -3,7 +3,7 @@ class User
 
   before_create :set_default_thing_templates
 
-  # created_at is theoretically the date the user was created... in practise 
+  # created_at is theoretically the date the user was created... in practice 
   # we want this date in the user's time-zone so we don't actually create it
   # until the first call to update_user_time_diff (which is when client-side code
   # sends the user's time)
@@ -11,7 +11,7 @@ class User
   field :created_at, type: Date
 
   # time diff is the difference between the user's local time and UTC in seconds
-  # UTC + time diff = local time
+  # UTC + time_diff = user's local time
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
@@ -23,7 +23,7 @@ class User
   end
 
   def user_created_at
-    (self.created_at + self.time_diff)
+    self.created_at + self.time_diff
   end
 
   # rand_str is a random string used as the user ID
@@ -60,19 +60,11 @@ class User
      "ate 3 nutritious meals"]
 
   def set_default_thing_templates
-    DEFAULT_THING_TEMPLATES.each do |t|
-      self.thing_templates << ThingTemplate.new(name: t)
-    end
+    DEFAULT_THING_TEMPLATES.each { |t| self.thing_templates << ThingTemplate.new(name: t) }
   end
 
   def create_thing(thing_template)
-    date = user_today
-    thing_template_id = thing_template._id
-    # check we aren't creating a duplicate thing
-    if self.things.where(thing_template_id: thing_template_id, date: date).count >= 0 
-      return false
-    end
-    thing = Thing.new name: thing_template.name, date: date, thing_template_id: thing_template_id
+    thing = Thing.new name: thing_template.name, date: user_today, thing_template_id: thing_template._id
     self.things << thing
     self.save
     thing
@@ -138,11 +130,11 @@ class User
       thing_hash[js_stamp] += 1
     end
 
-    # force today = 0
+    # force today ||= 0 (max x axis)
     js_stamp = user_today.to_time.to_i * 1000
     thing_hash[js_stamp] ||= 0
 
-    # force created_at = 0
+    # force created_at ||= 0 (min x axis)
     if self.created_at != nil
       js_stamp = self.created_at.to_time.to_i * 1000
       thing_hash[js_stamp] ||= 0
@@ -164,6 +156,8 @@ class User
   end
 
   def self.cleanup_old_users
+    # do this every month or so (cron job?)
+    # to empty DB of inactive users
     cutoff = Date.today - 1.month
     Rails.logger.info "Deleting users created on or before #{cutoff}"
     total_users = User.count
