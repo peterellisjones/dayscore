@@ -66,7 +66,13 @@ class User
   end
 
   def create_thing(thing_template)
-    thing = Thing.new name: thing_template.name, date: user_today
+    date = user_today
+    thing_template_id = thing_template._id
+    # check we aren't creating a duplicate thing
+    if self.things.where(thing_template_id: thing_template_id, date: date).count >= 0 
+      return false
+    end
+    thing = Thing.new name: thing_template.name, date: date, thing_template_id: thing_template_id
     self.things << thing
     self.save
     thing
