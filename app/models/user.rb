@@ -15,11 +15,15 @@ class User
   # this is used for calculating when days change according to the user
   field :time_diff, type: Integer, default: 0
 
+  # update_user_time_diff called as before_filter to create_thing and create_template
   def update_user_time_diff (user_timezone_offset_minutes)
-    self.time_diff = - user_timezone_offset_minutes * 60 
-    if self.created_at == nil
-      self.created_at = user_today
-    end
+    time_diff = - user_timezone_offset_minutes * 60
+    # only dirty attribute if necesary  
+    self.time_diff = time_diff if self.time_diff != time_diff
+    # set created_at if not yet set
+    self.created_at = user_today if self.created_at == nil
+    # don't need save since this will be called by real purpose of 
+    # controller action
   end
 
   def user_created_at
@@ -64,7 +68,7 @@ class User
   end
 
   def create_thing(thing_template)
-    thing = Thing.new name: thing_template.name, date: user_today, thing_template_id: thing_template._id
+    thing = Thing.new(name: thing_template.name, date: user_today, thing_template_id: thing_template._id)
     self.things << thing
     self.save
     thing
@@ -131,24 +135,22 @@ class User
     end
 
     # force today ||= 0 (max x axis)
-    js_stamp = user_today.to_time.to_i * 1000
-    thing_hash[js_stamp] ||= 0
+    thing_hash[user_today.to_time.to_i * 1000] ||= 0
 
     # force created_at ||= 0 (min x axis)
     if self.created_at != nil
-      js_stamp = self.created_at.to_time.to_i * 1000
-      thing_hash[js_stamp] ||= 0
+      thing_hash[self.created_at.to_time.to_i * 1000] ||= 0
     end
 
     thing_hash
   end
 
-  # test data - create some random things
+  # test data - create some random things for the last 
   def create_test_data
     Date.today.downto(Date.today - 2.months) do |day|
       self.thing_templates.each do |t|
         if Random.rand(10) >= 8
-          self.things << Thing.new(name: t.name, date: day)
+          self.things << Thing.new(name: t.name, date: day, thing_template_id: t._id)
         end
       end
     end 
@@ -166,7 +168,7 @@ class User
       if u.created_at != nil && u.created_at <= cutoff
         # if user didn't make any changes
         if u.things.count == 4 && u.things.all? { |t| DEFAULT_THING_TEMPLATES.include? t.name }
-          puts "DELETING USER #{u.inspect}"
+          Rails.logger.info "DELETING USER #{u.inspect}"
           u.destroy
         end
       end
