@@ -36,7 +36,7 @@ class MainController < ApplicationController
 
   def create_thing
     thing_template = @user.thing_templates.where(id: params[:template_id]).first
-    if thing_template == nil
+    if thing_template.nil?
       render :json => "Couldn't find thing template", :status => :unprocessable_entity and return
     end
     thing = @user.create_thing(thing_template)

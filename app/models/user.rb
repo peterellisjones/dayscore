@@ -145,7 +145,7 @@ class User
     thing_hash
   end
 
-  # test data - create some random things for the last 
+  # test data - create some random things for the last 2 months
   def create_test_data
     Date.today.downto(Date.today - 2.months) do |day|
       self.thing_templates.each do |t|
