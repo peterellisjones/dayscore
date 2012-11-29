@@ -19,23 +19,45 @@
       .container  
         %header.jumbotron.subhead
           .row
+            .span12
+              #alert
             .span7
-              %h1 DayScore
+              %h1
+                = link_to 'DayScore', :user
               %p.lead 
                 Reinforce positive habits by keeping score. 
                 %br
                 - link = 'http://dayscore.net' + user_path(@user.rand_str)
                 = link_to 'Bookmark this page', link, class: 'bookmark-link'
                 and come back tomorrow to update your score.
-          = yield
+            .span5
+              .extras
+                %ul
+                  -#%li
+                  -#  %a.toggle-email Daily emails
+                  -#  .email-wrap
+                  -#    %form.email
+                  -#      %input{'type' => 'text', 'placeholder' => 'yourname@example.com'}
+                  %li
+                    %a.toggle-datepicker{href:'#'} Edit past days
+                    %br
+                    .datepicker-wrap
+                      - default_date = @date ? @date : Date.today 
+                      %input.datepicker{'type' =>'text','data-behaviour' => 'datepicker', 'value' => default_date.strftime("%Y/%m/%d")}
+                  %li
+                    = link_to 'Data export (CSV)', :export_csv
+        = yield
         :javascript
           window.user_random_string = "#{@user.rand_str}";
+          window.chart_data_hash = eval(#{@date ? @user.chart_data(@date).to_json : @user.chart_data().to_json});
+        - if @date
+          :javascript
+            window.active_date = "#{@date}";
+
         - cache('footer_and_javascript') do
           %footer.footer
             .row
               .span12
-                %hr
-                = link_to 'Export my data (CSV)', :export_csv
                 .pull-right.copyright
                   &copy; 2012 
                   = link_to 'Peter Ellis Jones', 'http://ukoki.com'

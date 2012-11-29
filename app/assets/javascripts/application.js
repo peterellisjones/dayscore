@@ -15,4 +15,5 @@
 //= require excanvas.min
 //= require color
 //= require jquery.flot
+//= require bootstrap-datepicker
 //= require main

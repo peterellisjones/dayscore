@@ -1,12 +1,34 @@
 class MainController < ApplicationController
-  before_filter :get_user, except: [:home, :create_user]
+  before_filter :get_or_create_user, only: [:home, :date]
+  before_filter :get_user, except: [:home, :date, :create_user]
   before_filter :update_user_time_diff, only: [:create_thing, :create_template]
+  before_filter :get_date
 
   def home
+    if @date
+      @things = @user.things_by_date(@date)
+    else
+      @things = @user.todays_things
+    end
+  end
+
+  def get_date
+    if params.has_key? :date
+      @date = Date.parse(params[:date])
+      @date = nil if @date == @user.user_today
+    end
+  end
+
+  def email
+    @user.send_email
+    render :json => "Email sent"
+  end
+
+  def get_or_create_user
     @user = User.where(rand_str: params[:user_id]).first
     unless @user
       create_user   
-    end
+    end    
   end
 
   def create_user
@@ -39,7 +61,11 @@ class MainController < ApplicationController
     if thing_template.nil?
       render :json => "Couldn't find thing template", :status => :unprocessable_entity and return
     end
-    thing = @user.create_thing(thing_template)
+    if @date
+      thing = @user.create_thing(thing_template, @date)
+    else
+      thing = @user.create_thing(thing_template)
+    end
     render :json => thing
   end
 

@@ -67,8 +67,9 @@ class User
     DEFAULT_THING_TEMPLATES.each { |t| self.thing_templates << ThingTemplate.new(name: t) }
   end
 
-  def create_thing(thing_template)
-    thing = Thing.new(name: thing_template.name, date: user_today, thing_template_id: thing_template._id)
+  def create_thing(thing_template, date = nil)
+    date ||= user_today
+    thing = Thing.new(name: thing_template.name, date: date, thing_template_id: thing_template._id)
     self.things << thing
     self.save
     thing
@@ -94,6 +95,10 @@ class User
 
   def todays_things
     self.things.where(date: user_today).entries
+  end
+
+  def things_by_date date
+    self.things.where(date: date).entries
   end
 
   def points_this_week
@@ -125,7 +130,7 @@ class User
   # returns chart data as mapping from JS timestamp to number of things that day.
   # if the extremes of the chart have no data, it puts zeros there to enforce the
   # length of the chart (ie from created_at to today)
-  def chart_data
+  def chart_data(date = nil)
     thing_hash = {}
     # create hash index by JS time stamp (ie milliseconds since 1970)
     self.things.each do |thing|
@@ -142,7 +147,20 @@ class User
       thing_hash[self.created_at.to_time.to_i * 1000] ||= 0
     end
 
+    # force active date ||= 0
+    if date
+      thing_hash[date.to_time.to_i * 1000] ||= 0
+    end
+
     thing_hash
+  end
+
+  field :email, type: String
+
+  def send_email
+    unless self.email
+      throw "No email for this user"
+    end
   end
 
   # test data - create some random things for the last 2 months

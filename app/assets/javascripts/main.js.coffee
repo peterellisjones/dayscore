@@ -5,6 +5,20 @@ $ ->
   if !user_random_string?
     throw "user random string not found"
 
+  standard_data = () ->
+    data = {}
+    data['timezone_offset_minutes'] = (new Date()).getTimezoneOffset()
+    if window.active_date?
+      data['date'] = window.active_date
+    data
+
+  alert = (message) ->
+    $('#alert').slideUp()
+    $('#alert').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>')
+    $('#alert').slideDown()
+    $('#alert .close').on 'click', (e) ->
+      $('#alert').slideUp()
+
   # returns color between red (p = 0.0) and green (p = 1.0)
   # hsvToRgb(Hue, Sat, Val) defined in color.js
   # used to change hue of score
@@ -50,8 +64,8 @@ $ ->
     $(this).find('.buttons').hide()
 
   destroy_thing_template = (template_id) ->
-    url = "#{user_random_string}/template/#{template_id}/destroy"
-    $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
+    url = "/#{user_random_string}/template/#{template_id}/destroy"
+    $.post url, standard_data(), (data, textStatus, jqXHR) ->
       div = $("##{data._id}").parents(".thing")
       div.css('height', div.height())
       div.animate {opacity: 0 },{ duration: 200, complete: () ->
@@ -62,8 +76,8 @@ $ ->
 
   set_inactive = (elem, callback = null) ->
     thing_id = $(elem).attr('id')
-    url = "#{user_random_string}/thing/#{thing_id}/destroy"  
-    $.post url, null, (data, textStatus, jqXHR) ->
+    url = "/#{user_random_string}/thing/#{thing_id}/destroy"  
+    $.post url, standard_data(), (data, textStatus, jqXHR) ->
       template_id = data._id
       # toggle active/inactive
       $("##{thing_id}").removeClass('active')
@@ -77,8 +91,8 @@ $ ->
 
   set_active = (elem) ->
     template_id = $(elem).attr('id')
-    url = "#{user_random_string}/thing/#{template_id}/create"
-    $.post url, {'timezone_offset_minutes': (new Date()).getTimezoneOffset()}, (data, textStatus, jqXHR) ->
+    url = "/#{user_random_string}/thing/#{template_id}/create"
+    $.post url, standard_data(), (data, textStatus, jqXHR) ->
       thing_id = data._id
       # toggle active/inactive
       $("##{template_id}").addClass('active')
@@ -138,10 +152,12 @@ $ ->
       if value and value != '' and value != old_value
         id = $(this).closest('.thing').find('.name').attr('id')
         if $("##{id}").hasClass('active')
-          url = "#{user_random_string}/thing/#{id}/edit"
+          url = "/#{user_random_string}/thing/#{id}/edit"
         else
-          url = "#{user_random_string}/template/#{id}/edit"
-        data = {name: value, old_name: old_value}
+          url = "/#{user_random_string}/template/#{id}/edit"
+        data = standard_data()
+        data['name'] = value
+        data['old_name'] = old_value
         $.post url, data, (ret, textStatus, jqXHR) ->
           $("##{ret._id}").text(ret.name)
 
@@ -156,8 +172,9 @@ $ ->
       if value == ''
         $('.add-thing a').click()
       else if value
-        url = "#{user_random_string}/template/create"
-        data = {name: value}
+        url = "/#{user_random_string}/template/create"
+        data = standard_data()
+        data['name'] = value
         $.post url, data, (ret, textStatus, jqXHR) ->
           prepend_thing_template ret
 
@@ -178,7 +195,7 @@ $ ->
     $('.bookmark-link').unbind()
     $('.bookmark-link').click (e) ->
       e.preventDefault()
-      bookmarkUrl = this.href
+      bookmarkUrl = "http://dayscore.net/#{user_random_string}"
       bookmarkTitle = 'DayScore.net - Reinforce positive habits by keeping score'
 
       is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1
@@ -301,7 +318,18 @@ $ ->
   # updates score for today by val, 
   # then recalculates moving averages, and draws chart
   update_chart_data = (val) ->
-    window.chart_data[window.chart_data.length-1][1] += val
+    if window.active_date?
+      date = Date.parse(window.active_date) + (new Date()).getTimezoneOffset()*60*1000
+      # cycle through chart data until dat matches
+      for row in window.chart_data
+        if row[0] >= date
+          chart_data_row = row
+          break
+      if chart_data_row
+        chart_data_row[1] += val
+    else
+      window.chart_data[window.chart_data.length-1][1] += val
+
     sma_seven = calc_ma(7)
     sma_thirty = calc_ma(30)
     draw_chart()
@@ -337,4 +365,35 @@ $ ->
   reset_button_functionality()
   process_chart_data()
   draw_chart()
+
+  # initialise email
+  $('.toggle-email').on 'click', (e) ->
+    $('.email-wrap').slideToggle()
+  $('form.email').on 'submit', (e) ->
+    e.preventDefault()
+    email = $(this).find('input').val()
+    if email == ''
+      alert('Email removed. You will no longer recieve emails from dayscore.net')
+    else
+      alert('Email added successfully. You will now recieve daily emails showing yesterday\'s progress and your latest stats. Simply remove your email to unsubscribe. Your email address will never be used for any other purposes or shared with third parties.')
+
+
+    console.log "SUBMIT"
+
+  # initialise datepicker
+  today = new Date()
+  today_str = "#{today.getFullYear()}/#{today.getMonth()+1}/#{today.getDate()}" 
+  $('.datepicker').datepicker(
+    'format':'yyyy/mm/dd', 
+    'weekStart':1, 
+    'autoclose':true, 
+    'startDate':'2012/08/01',
+    'endDate':today_str).on 'changeDate', (e) -> 
+      date = $('.datepicker').val().replace /\//g, '-'
+      # redirect to correct date
+      window.location.href = "/#{user_random_string}/date/#{date}"
+
+  $('.toggle-datepicker').on 'click', (e) ->
+    e.preventDefault()
+    $('.datepicker-wrap').slideToggle()
   

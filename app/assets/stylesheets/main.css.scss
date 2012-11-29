@@ -5,6 +5,9 @@
 header {
   h1 { 
     font-size: 60px;
+    a:hover {
+      text-decoration: none;
+    }
   }
   padding-top: 60px;
   padding-bottom: 40px;
@@ -20,6 +23,23 @@ header {
     }
     color: #888;
     line-height: 1.2em;
+  }
+
+  .extras {
+    text-align: right;
+    li {
+      list-style: none;
+    }
+    .datepicker-wrap {
+      display: none;
+      .datepicker {
+        width: 80px;
+        text-align: center;
+      }
+    }
+    .email-wrap form {
+      margin: 0px;
+    }
   }
 }
 

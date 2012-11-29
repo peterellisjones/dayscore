@@ -1,7 +1,5 @@
 Habit::Application.routes.draw do
 
-
-
   # things
   post ':user_id/thing/:template_id/create' => 'main#create_thing'
   post ':user_id/thing/:thing_id/destroy' => 'main#destroy_thing'
@@ -15,5 +13,7 @@ Habit::Application.routes.draw do
   # misc
   get ':user_id' => 'main#home', :as => :user
   get ':user_id/xml' => 'main#export_csv', :as => :export_csv
+  get ':user_id/date/:date' => 'main#home'
+  get ':user_id/email' => 'main#email'
   root :to => 'main#create_user'
 end

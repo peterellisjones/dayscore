@@ -10,5 +10,6 @@
  *
  *= require_self
  *= require cerulean
+ *= require bootstrap-datepicker
  *= require_tree .
  */

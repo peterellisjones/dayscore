@@ -2,11 +2,13 @@
   .span8
     .things
       %p.intro 
-        Today I...
+        - if @date
+          = "On #{@date.strftime("%B %d %Y")}, I..."
+        - else 
+          Today I...
         %i (click all that apply)
-      - todays_things = @user.todays_things
       -# active_hash is a map of 'ticked' things, mapping name => id
-      - active_hash = Hash[todays_things.collect {|v| [v['name'], v['_id']] }]
+      - active_hash = Hash[@things.collect {|v| [v['name'], v['_id']] }]
       -# iterate over thing templates checking if in active_hash
       - @user.thing_templates.each do |tt|
         .thing
@@ -29,28 +31,27 @@
         %input.input-medium{type: 'text'}
         %button.btn Submit
   .span4
-    .scores
-      %p.intro 
-        Score
-      .score.today
-        %h1= todays_things.count
-      -# iterate over periods showing different scores
-      - {'this-week' => @user.points_this_week, 
-         'this-month' => @user.points_this_month, 
-         'all-time' => @user.points_all_time}.each do |period, score|
-        -# add digits class so CSS can display correct font-size
-        - clss = period + (score > 1000 ? ' thousands' : (score > 100 ? ' hundreds' : (score > 10 ? ' tens' : '')))
-        .score{class: clss, style: "display:none;"}
-          %h1= score
-      .buttons
-        %a.period.today.active today
-        |
-        %a.period.this-week this week
-        |
-        %a.period.this-month this month
-        |
-        %a.period.all-time total
+    - unless @date
+      .scores
+        %p.intro 
+          Score
+        .score.today
+          %h1= @things.count
+        -# iterate over periods showing different scores
+        - {'this-week' => @user.points_this_week, 
+           'this-month' => @user.points_this_month, 
+           'all-time' => @user.points_all_time}.each do |period, score|
+          -# add digits class so CSS can display correct font-size
+          - clss = period + (score > 1000 ? ' thousands' : (score > 100 ? ' hundreds' : (score > 10 ? ' tens' : '')))
+          .score{class: clss, style: "display:none;"}
+            %h1= score
+        .buttons
+          %a.period.today.active today
+          |
+          %a.period.this-week this week
+          |
+          %a.period.this-month this month
+          |
+          %a.period.all-time total  
   .span12
     #chart
-:javascript
-  window.chart_data_hash = eval(#{@user.chart_data.to_json});
