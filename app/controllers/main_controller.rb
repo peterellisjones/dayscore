@@ -83,9 +83,11 @@ class MainController < ApplicationController
     if thing == nil
       render :json => "Couldn't find thing", :status => :unprocessable_entity and return
     end
-    thing_template = @user.thing_templates.where(name: thing.name).first
+    thing_template = @user.thing_templates.where(id: thing.thing_template_id).first
     if thing_template == nil
-      render :json => "Couldn't find thing template", :status => :unprocessable_entity and return
+      #if template doesn't exist, create it
+      thing_template = ThingTemplate.new name: thing.name
+      @user.thing_templates << thing_template
     end
     thing.destroy
     # display template so client can switch thing for template
@@ -111,11 +113,13 @@ class MainController < ApplicationController
       render :json => "No name!", :status => :unprocessable_entity and return
     end
     
-    # need to update template too
-    thing_template = @user.thing_templates.where(name: old_name).first
-    thing_template.update_attribute(:name, params[:name])
+    # need to update template too, but only if editing todays date
+    unless @date
+      thing_template = @user.thing_templates.where(name: old_name).first
+      thing_template.update_attribute(:name, params[:name])
+    end
 
-    thing.update_attributes(name: params[:name], thing_template_id: thing_template._id)
+    thing.update_attributes(name: params[:name])
 
     render :json => thing
   end

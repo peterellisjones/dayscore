@@ -7,15 +7,17 @@
         - else 
           Today I...
         %i (click all that apply)
-      -# active_hash is a map of 'ticked' things, mapping name => id
-      - active_hash = Hash[@things.collect {|v| [v['name'], v['_id']] }]
+      -# active_hash is a map of 'ticked' things, mapping template_id => thing
+      - active_hash = Hash[@things.collect {|v| [v.thing_template_id, v] }]
       -# iterate over thing templates checking if in active_hash
       - @user.thing_templates.each do |tt|
         .thing
-          - if active_hash.has_key? tt.name
+          - if active_hash.has_key? tt._id
+            - thing = active_hash[tt._id]
             %div.icon
               %i.icon-ok
-            %a.name.active{id: active_hash[tt.name]}= tt.name
+            %a.name.active{id: thing._id}= thing.name
+            - active_hash.delete(tt._id)
           - else
             %div.icon
             %a.name.inactive{id: tt._id}= tt.name
@@ -25,6 +27,11 @@
           %p.buttons
             %a.edit edit
             %a.delete delete
+      - active_hash.values.each do |t|
+        .thing
+          %div.icon
+            %i.icon-ok
+          %a.name.active{id: t._id}= t.name
     .add-thing
       %a add more
       %form.form-inline
