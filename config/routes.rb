@@ -12,7 +12,7 @@ Habit::Application.routes.draw do
 
   # misc
   get ':user_id' => 'main#home', :as => :user
-  get ':user_id/xml' => 'main#export_csv', :as => :export_csv
+  get ':user_id/csv' => 'main#export_csv', :as => :export_csv
   get ':user_id/date/:date' => 'main#home'
   get ':user_id/email' => 'main#email'
   root :to => 'main#create_user'
