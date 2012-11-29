@@ -105,4 +105,14 @@ class MainController < ApplicationController
     thing_template.update_attribute(:name, params[:name])
     render :json => thing_template
   end
+
+  def export_csv
+    c = CSV.generate do |csv|
+      csv << ['date', 'item']
+      @user.things.each do |t|
+        csv << [t.date, t.name]
+      end
+    end
+    send_data c, :filename => "dayscore.csv"
+  end
 end
