@@ -39,13 +39,13 @@
                   -#    %form.email
                   -#      %input{'type' => 'text', 'placeholder' => 'yourname@example.com'}
                   %li
-                    %a.toggle-datepicker{href:'#'} Edit past days
+                    %a.toggle-datepicker{href:'#'} Change day
                     %br
                     .datepicker-wrap
                       - default_date = @date ? @date : Date.today 
                       %input.datepicker{'type' =>'text','data-behaviour' => 'datepicker', 'value' => default_date.strftime("%Y/%m/%d")}
                   %li
-                    = link_to 'Data export (CSV)', :export_csv
+                    = link_to 'Export data (CSV)', :export_csv
         = yield
         :javascript
           window.user_random_string = "#{@user.rand_str}";
