@@ -292,7 +292,7 @@ $ ->
     thirty_day_ma.color = '#ACDBF5'
     thirty_day_ma.lines = {lineWidth: 5 }
 
-    data = [daily_score, seven_day_ma, thirty_day_ma]
+    data = [thirty_day_ma, seven_day_ma, daily_score]
 
     xaxis = {}
     xaxis.mode = 'time'
