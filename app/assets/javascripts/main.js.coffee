@@ -276,7 +276,7 @@ $ ->
     daily_score = {}
     daily_score.label =  'daily score'
     daily_score.data =  window.chart_data
-    daily_score.color = '#ACDBF5'
+    daily_score.color = '#317EAC'
     daily_score.lines = {lineWidth: 5, show: true}
     daily_score.points = point_options
 
@@ -289,7 +289,7 @@ $ ->
     thirty_day_ma = {}
     thirty_day_ma.label = '30 day moving average'
     thirty_day_ma.data = sma_thirty
-    thirty_day_ma.color = '#317EAC'
+    thirty_day_ma.color = '#ACDBF5'
     thirty_day_ma.lines = {lineWidth: 5 }
 
     data = [daily_score, seven_day_ma, thirty_day_ma]

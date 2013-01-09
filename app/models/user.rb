@@ -142,7 +142,7 @@ class User
     # force today ||= 0 (max x axis)
     thing_hash[user_today.to_time.to_i * 1000] ||= 0
 
-    # force created_at ||= 0 (min x axis)
+    # force created_at ||= 0 (max x axis)
     if self.created_at != nil
       thing_hash[self.created_at.to_time.to_i * 1000] ||= 0
     end
@@ -187,6 +187,7 @@ class User
         # if user didn't make any changes
         if u.things.count == 4 && u.things.all? { |t| DEFAULT_THING_TEMPLATES.include? t.name }
           Rails.logger.info "DELETING USER #{u.inspect}"
+          # destroy!
           u.destroy
         end
       end
