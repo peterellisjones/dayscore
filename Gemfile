@@ -33,7 +33,7 @@ group :production do
   gem "yui-compressor"
 end
 
-gem "mongoid", ">= 3.0.5"
+gem "mongoid"
 gem "bson_ext"
 gem "haml", ">= 3.1.7"
 gem "rspec-rails", ">= 2.11.0", :group => [:development, :test]

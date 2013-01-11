@@ -248,7 +248,7 @@ DEPENDENCIES
   jquery-rails
   launchy (>= 2.1.2)
   less-rails
-  mongoid (>= 3.0.5)
+  mongoid
   mongoid-rspec (>= 1.4.6)
   newrelic_rpm
   quiet_assets
