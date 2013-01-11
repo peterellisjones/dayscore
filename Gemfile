@@ -14,12 +14,12 @@ group :assets do
   gem 'sass-rails'
   gem 'coffee-rails'
   gem 'compass-rails'
-  gem 'twitter-bootstrap-rails'
   gem 'uglifier'
 end
 
 gem 'jquery-rails'
 gem 'less-rails'
+gem 'twitter-bootstrap-rails'
 
 group :development do
   gem "haml-rails"
